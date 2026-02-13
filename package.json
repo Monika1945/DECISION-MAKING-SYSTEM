@@ -2,9 +2,9 @@
     "name": "placement-readiness-system",
     "version": "1.0.0",
     "scripts": {
-        "server": "cd server && npm run dev",
-        "client": "cd client-new && npm start",
-        "dev": "concurrently \"npm run server\" \"npm run client\""
+        "backend": "cd backend && npm run dev",
+        "frontend": "cd frontend && npm run dev",
+        "dev": "concurrently \"npm run backend\" \"npm run frontend\""
     },
     "dependencies": {
         "concurrently": "^8.2.2"
