@@ -13,11 +13,18 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/register', formData);
+            const dataToSubmit = {
+                ...formData,
+                cgpa: Number(formData.cgpa),
+                backlogs: Number(formData.backlogs)
+            };
+            const res = await axios.post('http://localhost:5000/api/auth/register', dataToSubmit);
             localStorage.setItem('token', res.data.token);
             navigate('/dashboard');
         } catch (err) {
-            alert(err.response?.data?.msg || 'Signup failed');
+            console.error('Signup error:', err);
+            const errorMsg = err.response?.data?.msg || 'Signup failed. Please check if the server is running.';
+            alert(errorMsg);
         }
     };
 
@@ -33,15 +40,15 @@ const Signup = () => {
                 <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Create Account</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-gray-700 text-sm font-semibold mb-1">Full Name</label>
+                        <label className="block text-gray-700 text-sm font-semibold mb-1">Full Name <span className="text-red-500">*</span></label>
                         <input type="text" name="name" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
                     </div>
                     <div>
-                        <label className="block text-gray-700 text-sm font-semibold mb-1">Email</label>
+                        <label className="block text-gray-700 text-sm font-semibold mb-1">Email <span className="text-red-500">*</span></label>
                         <input type="email" name="email" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
                     </div>
                     <div>
-                        <label className="block text-gray-700 text-sm font-semibold mb-1">Password</label>
+                        <label className="block text-gray-700 text-sm font-semibold mb-1">Password <span className="text-red-500">*</span></label>
                         <input type="password" name="password" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -52,6 +59,16 @@ const Signup = () => {
                         <div>
                             <label className="block text-gray-700 text-sm font-semibold mb-1">Year</label>
                             <input type="text" name="year" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-gray-700 text-sm font-semibold mb-1">CGPA <span className="text-red-500">*</span></label>
+                            <input type="number" step="0.01" name="cgpa" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
+                        </div>
+                        <div>
+                            <label className="block text-gray-700 text-sm font-semibold mb-1">Backlogs <span className="text-red-500">*</span></label>
+                            <input type="number" name="backlogs" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
                         </div>
                     </div>
                     <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 internal-shadow rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 mt-4">

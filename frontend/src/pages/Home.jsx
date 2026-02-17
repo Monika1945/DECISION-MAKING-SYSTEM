@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import ProjectLogo from '../components/Logo';
 
 const Home = () => {
     return (
@@ -13,12 +13,9 @@ const Home = () => {
 
             {/* Navbar */}
             <nav className="relative z-10 container mx-auto px-6 py-4 flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-lg"></div>
-                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-                        ReadySetGo
-                    </span>
-                </div>
+                <Link to="/">
+                    <ProjectLogo />
+                </Link>
                 <div className="space-x-4">
                     <Link to="/login" className="text-gray-600 hover:text-gray-900 font-medium transition">Login</Link>
                     <Link to="/signup" className="bg-gray-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-gray-800 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
@@ -40,8 +37,8 @@ const Home = () => {
                 </p>
 
                 <div className="flex justify-center space-x-4">
-                    <Link to="/signup" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-200">
-                        Get Started Free
+                    <Link to="/about" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition transform duration-200">
+                        Explore More
                     </Link>
                     <Link to="/login" className="bg-white text-gray-800 px-8 py-4 rounded-full font-bold text-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition">
                         Log In
