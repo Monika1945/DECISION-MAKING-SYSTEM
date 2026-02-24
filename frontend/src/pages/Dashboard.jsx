@@ -148,7 +148,6 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-
                     {/* Right Column: Analytics & Latest Result */}
                     <div className="lg:col-span-8 space-y-8">
                         {!latestEval ? (

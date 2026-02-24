@@ -6,6 +6,8 @@ const Signup = () => {
     const [formData, setFormData] = useState({
         name: '', email: '', password: '', department: '', year: '', cgpa: '', backlogs: 0
     });
+    const [isHovered, setIsHovered] = useState(false);
+    const [isLinkHovered, setIsLinkHovered] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,58 +31,209 @@ const Signup = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 relative overflow-hidden py-12">
+        <div style={styles.pageWrapper}>
             {/* Background Shapes */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-                <div className="absolute bottom-[10%] left-[10%] w-80 h-80 bg-green-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
-                <div className="absolute top-[10%] right-[10%] w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div style={styles.backgroundContainer}>
+                <div style={{ ...styles.blob, ...styles.blob1 }}></div>
+                <div style={{ ...styles.blob, ...styles.blob2 }}></div>
             </div>
 
-            <div className="relative z-10 glass-panel p-10 rounded-2xl shadow-xl w-full max-w-lg">
-                <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Create Account</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-gray-700 text-sm font-semibold mb-1">Full Name <span className="text-red-500">*</span></label>
-                        <input type="text" name="name" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
+            <div style={styles.card}>
+                <h2 style={styles.header}>Create Account</h2>
+                <form onSubmit={handleSubmit} style={styles.form}>
+                    <div style={styles.inputGroup}>
+                        <label style={styles.label}>Full Name <span style={styles.required}>*</span></label>
+                        <input type="text" name="name" onChange={handleChange} style={styles.input} required />
                     </div>
-                    <div>
-                        <label className="block text-gray-700 text-sm font-semibold mb-1">Email <span className="text-red-500">*</span></label>
-                        <input type="email" name="email" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
+                    <div style={styles.inputGroup}>
+                        <label style={styles.label}>Email <span style={styles.required}>*</span></label>
+                        <input type="email" name="email" onChange={handleChange} style={styles.input} required />
                     </div>
-                    <div>
-                        <label className="block text-gray-700 text-sm font-semibold mb-1">Password <span className="text-red-500">*</span></label>
-                        <input type="password" name="password" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
+                    <div style={styles.inputGroup}>
+                        <label style={styles.label}>Password <span style={styles.required}>*</span></label>
+                        <input type="password" name="password" onChange={handleChange} style={styles.input} required />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-gray-700 text-sm font-semibold mb-1">Department</label>
-                            <input type="text" name="department" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" />
+                    <div style={styles.row}>
+                        <div style={styles.col}>
+                            <label style={styles.label}>Department</label>
+                            <input type="text" name="department" onChange={handleChange} style={styles.input} />
                         </div>
-                        <div>
-                            <label className="block text-gray-700 text-sm font-semibold mb-1">Year</label>
-                            <input type="text" name="year" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-gray-700 text-sm font-semibold mb-1">CGPA <span className="text-red-500">*</span></label>
-                            <input type="number" step="0.01" name="cgpa" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 text-sm font-semibold mb-1">Backlogs <span className="text-red-500">*</span></label>
-                            <input type="number" name="backlogs" onChange={handleChange} className="w-full px-4 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:bg-white focus:outline-none transition" required />
+                        <div style={styles.col}>
+                            <label style={styles.label}>Year</label>
+                            <input type="text" name="year" onChange={handleChange} style={styles.input} />
                         </div>
                     </div>
-                    <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 internal-shadow rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200 mt-4">
+                    <div style={styles.row}>
+                        <div style={styles.col}>
+                            <label style={styles.label}>CGPA <span style={styles.required}>*</span></label>
+                            <input type="number" step="0.01" name="cgpa" onChange={handleChange} style={styles.input} required />
+                        </div>
+                        <div style={styles.col}>
+                            <label style={styles.label}>Backlogs <span style={styles.required}>*</span></label>
+                            <input type="number" name="backlogs" onChange={handleChange} style={styles.input} required />
+                        </div>
+                    </div>
+                    <button
+                        type="submit"
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                        style={{
+                            ...styles.button,
+                            ...(isHovered ? styles.buttonHover : {})
+                        }}
+                    >
                         Sign Up
                     </button>
                 </form>
-                <p className="mt-6 text-center text-gray-600">
-                    Already have an account? <Link to="/login" className="text-blue-600 font-semibold hover:underline">Log In</Link>
+                <p style={styles.footerText}>
+                    Already have an account?{' '}
+                    <Link
+                        to="/login"
+                        onMouseEnter={() => setIsLinkHovered(true)}
+                        onMouseLeave={() => setIsLinkHovered(false)}
+                        style={{
+                            ...styles.link,
+                            ...(isLinkHovered ? styles.linkHover : {})
+                        }}
+                    >
+                        Log In
+                    </Link>
                 </p>
             </div>
         </div>
     );
+};
+
+const styles = {
+    pageWrapper: {
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f9fafb',
+        position: 'relative',
+        overflow: 'hidden',
+        padding: '3rem 0',
+        fontFamily: '"Inter", sans-serif',
+    },
+    backgroundContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        zIndex: 0,
+    },
+    blob: {
+        position: 'absolute',
+        width: '20rem',
+        height: '20rem',
+        borderRadius: '50%',
+        mixBlendMode: 'multiply',
+        filter: 'blur(40px)',
+        opacity: 0.3,
+    },
+    blob1: {
+        bottom: '10%',
+        left: '10%',
+        backgroundColor: '#86efac', // green-300
+    },
+    blob2: {
+        top: '10%',
+        right: '10%',
+        backgroundColor: '#93c5fd', // blue-300
+    },
+    card: {
+        position: 'relative',
+        zIndex: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        padding: '2.5rem',
+        borderRadius: '1rem',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        width: '100%',
+        maxWidth: '32rem',
+    },
+    header: {
+        fontSize: '1.875rem',
+        fontWeight: 'bold',
+        marginBottom: '2rem',
+        textAlign: 'center',
+        color: '#1f2937',
+    },
+    form: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+    },
+    inputGroup: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.25rem',
+    },
+    row: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '1rem',
+    },
+    col: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.25rem',
+    },
+    label: {
+        display: 'block',
+        color: '#374151',
+        fontSize: '0.875rem',
+        fontWeight: '600',
+    },
+    required: {
+        color: '#ef4444',
+    },
+    input: {
+        width: '100%',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.5rem',
+        backgroundColor: '#f9fafb',
+        border: '1px solid #e5e7eb',
+        outline: 'none',
+        transition: 'all 0.2s',
+        fontSize: '1rem',
+        boxSizing: 'border-box',
+    },
+    button: {
+        width: '100%',
+        background: 'linear-gradient(to right, #2563eb, #9333ea)',
+        color: 'white',
+        fontWeight: 'bold',
+        padding: '0.75rem',
+        borderRadius: '0.5rem',
+        border: 'none',
+        cursor: 'pointer',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        transition: 'all 0.2s',
+        marginTop: '1rem',
+    },
+    buttonHover: {
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        transform: 'translateY(-2px)',
+    },
+    footerText: {
+        marginTop: '1.5rem',
+        textAlign: 'center',
+        color: '#4b5563',
+    },
+    link: {
+        color: '#2563eb',
+        fontWeight: '600',
+        textDecoration: 'none',
+        transition: 'color 0.2s',
+    },
+    linkHover: {
+        textDecoration: 'underline',
+    },
 };
 
 export default Signup;
