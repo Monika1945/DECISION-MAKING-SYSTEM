@@ -4,6 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import SidebarMenu from '../components/SidebarMenu';
 import ProjectLogo from '../components/Logo';
 
+const API_BASE = "https://decision-making-system.onrender.com";
+
 const Evaluation = () => {
     const [scores, setScores] = useState({
         technicalScore: 0,
@@ -54,9 +56,9 @@ const Evaluation = () => {
                 ...scores,
                 technicalSkills
             };
-            await axios.post('http://localhost:5000/api/evaluation', dataToSubmit, {
-                headers: { 'x-auth-token': token }
-            });
+            await axios.post(`${API_BASE}/api/evaluation`, dataToSubmit, {
+    headers: { 'x-auth-token': token }
+});
             setTimeout(() => {
                 setLoading(false);
                 navigate('/result');

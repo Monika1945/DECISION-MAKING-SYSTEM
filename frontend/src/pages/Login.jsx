@@ -8,20 +8,22 @@ const Login = () => {
     const [isLinkHovered, setIsLinkHovered] = useState(false);
     const navigate = useNavigate();
 
+    const API_BASE = "https://decision-making-system.onrender.com";
+
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', formData);
-            localStorage.setItem('token', res.data.token);
-            navigate('/dashboard');
-        } catch (err) {
-            console.error('Login error:', err);
-            const errorMsg = err.response?.data?.msg || 'Login failed. Please check if the server is running.';
-            alert(errorMsg);
-        }
-    };
+    e.preventDefault();
+    try {
+        const res = await axios.post(`${API_BASE}/api/auth/login`, formData);
+        localStorage.setItem('token', res.data.token);
+        navigate('/dashboard');
+    } catch (err) {
+        console.error('Login error:', err);
+        const errorMsg = err.response?.data?.msg || 'Login failed. Please try again.';
+        alert(errorMsg);
+    }
+};
 
     return (
         <div style={styles.pageWrapper}>

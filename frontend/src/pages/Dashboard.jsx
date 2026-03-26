@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SidebarMenu from '../components/SidebarMenu';
 import ProjectLogo from '../components/Logo';
 
+const API_BASE = "https://decision-making-system.onrender.com";
 const Dashboard = () => {
     const [user, setUser] = useState(null);
     const [latestEval, setLatestEval] = useState(null);
@@ -16,12 +17,12 @@ const Dashboard = () => {
             if (!token) return navigate('/login');
 
             try {
-                const userRes = await axios.get('http://localhost:5000/api/auth/user', {
+               const userRes = await axios.get(`${API_BASE}/api/auth/user`, {
                     headers: { 'x-auth-token': token }
                 });
                 setUser(userRes.data);
 
-                const evalRes = await axios.get('http://localhost:5000/api/evaluation', {
+                const evalRes = await axios.get(`${API_BASE}/api/evaluation`, {
                     headers: { 'x-auth-token': token }
                 });
                 setLatestEval(evalRes.data);
