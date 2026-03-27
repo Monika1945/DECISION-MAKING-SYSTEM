@@ -213,7 +213,7 @@ const btnBlack = {
 };
 
 const btnPink = {
-    background: "linear-gradient(135deg, #ff512f, #dd2476)",
+   background: "linear-gradient(135deg, #4facfe, #00f2fe)",
     color: "white",
     padding: "12px 25px",
     borderRadius: "10px",
