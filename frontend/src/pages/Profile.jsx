@@ -29,58 +29,76 @@ const Profile = () => {
 
     const navigate = useNavigate();
 
+    // ✅ FETCH USER
     useEffect(() => {
         const fetchUser = async () => {
             const token = localStorage.getItem('token');
             if (!token) return navigate('/login');
 
-            const res = await axios.get(`${API_BASE}/api/auth/user`, {
-                headers: { 'x-auth-token': token }
-            });
+            try {
+                const res = await axios.get(`${API_BASE}/api/auth/user`, {
+                    headers: { 'x-auth-token': token }
+                });
 
-            setUser(res.data);
+                setUser(res.data);
 
-            setFormData({
-                name: res.data?.name || '',
-                email: res.data?.email || '',
-                city: res.data?.city || '',
-                college: res.data?.college || '',
-                cgpa: res.data?.cgpa || '',
-                department: res.data?.department || '',
-                year: res.data?.year || '',
-                skills: res.data?.skills?.join(', ') || '',
-                linkedin: res.data?.linkedin || '',
-                github: res.data?.github || '',
-                portfolio: res.data?.portfolio || '',
-                bio: res.data?.bio || '',
-                experience: res.data?.experience || '',
-                projects: res.data?.projects || ''
-            });
+                setFormData({
+                    name: res.data?.name || '',
+                    email: res.data?.email || '',
+                    city: res.data?.city || '',
+                    college: res.data?.college || '',
+                    cgpa: res.data?.cgpa || '',
+                    department: res.data?.department || '',
+                    year: res.data?.year || '',
+                    skills: res.data?.skills?.join(', ') || '',
+                    linkedin: res.data?.linkedin || '',
+                    github: res.data?.github || '',
+                    portfolio: res.data?.portfolio || '',
+                    bio: res.data?.bio || '',
+                    experience: res.data?.experience || '',
+                    projects: res.data?.projects || ''
+                });
+
+            } catch (err) {
+                console.error(err);
+                navigate('/login');
+            }
         };
 
         fetchUser();
     }, [navigate]);
 
+    // ✅ INPUT CHANGE
     const handleChange = (e) => {
+        if (!isEditing) return; // 🔥 prevent unwanted change
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // ✅ SAVE ONLY WHEN CLICK SAVE
     const handleSave = async (e) => {
         e.preventDefault();
 
-        if (!isEditing) return; // 🔥 important fix
+        if (!isEditing) return; // 🔥 main fix
 
         const token = localStorage.getItem('token');
 
-        await axios.put(`${API_BASE}/api/auth/profile`, {
-            ...formData,
-            skills: formData.skills.split(',').map(s => s.trim())
-        }, {
-            headers: { 'x-auth-token': token }
-        });
+        try {
+            await axios.put(
+                `${API_BASE}/api/auth/profile`,
+                {
+                    ...formData,
+                    skills: formData.skills.split(',').map(s => s.trim())
+                },
+                { headers: { 'x-auth-token': token } }
+            );
 
-        setIsEditing(false);
-        alert("✅ Profile Updated!");
+            setIsEditing(false);
+            alert("✅ Profile Updated Successfully!");
+
+        } catch (err) {
+            console.error(err);
+            alert("❌ Error updating profile");
+        }
     };
 
     if (!user) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
@@ -111,13 +129,13 @@ const Profile = () => {
 
                 {/* CARD */}
                 <div style={{
-                    background: "linear-gradient(135deg, #ff9a9e, #fad0c4)", // 🔥 NEW BRIGHT COLOR
+                    background: "linear-gradient(135deg, #ffecd2, #fcb69f)",
                     borderRadius: "20px",
                     padding: "30px",
-                    boxShadow: "0 15px 35px rgba(0,0,0,0.15)"
+                    boxShadow: "0 15px 35px rgba(0,0,0,0.1)"
                 }}>
 
-                    {/* CIRCLE */}
+                    {/* 🔥 PROFILE CIRCLE */}
                     <div style={{
                         display: "flex",
                         justifyContent: "center",
@@ -127,7 +145,7 @@ const Profile = () => {
                             width: "90px",
                             height: "90px",
                             borderRadius: "50%",
-                            background: "linear-gradient(135deg, #ff6a00, #ee0979)",
+                            background: "linear-gradient(135deg, #ff512f, #dd2476)",
                             color: "white",
                             fontSize: "36px",
                             fontWeight: "bold",
@@ -164,14 +182,17 @@ const Profile = () => {
                         <div style={{ textAlign: "center", marginTop: "25px" }}>
                             {!isEditing ? (
                                 <button
-                                    type="button"
+                                    type="button"   // 🔥 VERY IMPORTANT
                                     onClick={() => setIsEditing(true)}
                                     style={btnBlack}
                                 >
                                     Edit Profile
                                 </button>
                             ) : (
-                                <button type="submit" style={btnPink}>
+                                <button
+                                    type="submit"
+                                    style={btnPink}
+                                >
                                     Save Changes
                                 </button>
                             )}
@@ -186,7 +207,7 @@ const Profile = () => {
 
 const Section = ({ title, children }) => (
     <div style={{ marginBottom: "20px" }}>
-        <h3 style={{ marginBottom: "10px", color: "#111" }}>{title}</h3>
+        <h3 style={{ marginBottom: "10px" }}>{title}</h3>
         {children}
     </div>
 );
@@ -213,7 +234,7 @@ const btnBlack = {
 };
 
 const btnPink = {
-    background: "linear-gradient(135deg, #ff6a00, #ee0979)",
+    background: "linear-gradient(135deg, #ff512f, #dd2476)",
     color: "white",
     padding: "12px 25px",
     borderRadius: "10px",
