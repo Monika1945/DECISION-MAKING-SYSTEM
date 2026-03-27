@@ -29,87 +29,66 @@ const Profile = () => {
 
     const navigate = useNavigate();
 
-    // ✅ FETCH USER
     useEffect(() => {
         const fetchUser = async () => {
             const token = localStorage.getItem('token');
             if (!token) return navigate('/login');
 
-            try {
-                const res = await axios.get(`${API_BASE}/api/auth/user`, {
-                    headers: { 'x-auth-token': token }
-                });
+            const res = await axios.get(`${API_BASE}/api/auth/user`, {
+                headers: { 'x-auth-token': token }
+            });
 
-                setUser(res.data);
+            setUser(res.data);
 
-                setFormData({
-                    name: res.data?.name || '',
-                    email: res.data?.email || '',
-                    city: res.data?.city || '',
-                    college: res.data?.college || '',
-                    cgpa: res.data?.cgpa || '',
-                    department: res.data?.department || '',
-                    year: res.data?.year || '',
-                    skills: res.data?.skills?.join(', ') || '',
-                    linkedin: res.data?.linkedin || '',
-                    github: res.data?.github || '',
-                    portfolio: res.data?.portfolio || '',
-                    bio: res.data?.bio || '',
-                    experience: res.data?.experience || '',
-                    projects: res.data?.projects || ''
-                });
-
-            } catch (err) {
-                console.error(err);
-                navigate('/login');
-            }
+            setFormData({
+                name: res.data?.name || '',
+                email: res.data?.email || '',
+                city: res.data?.city || '',
+                college: res.data?.college || '',
+                cgpa: res.data?.cgpa || '',
+                department: res.data?.department || '',
+                year: res.data?.year || '',
+                skills: res.data?.skills?.join(', ') || '',
+                linkedin: res.data?.linkedin || '',
+                github: res.data?.github || '',
+                portfolio: res.data?.portfolio || '',
+                bio: res.data?.bio || '',
+                experience: res.data?.experience || '',
+                projects: res.data?.projects || ''
+            });
         };
 
         fetchUser();
     }, [navigate]);
 
-    // ✅ INPUT CHANGE
     const handleChange = (e) => {
-        if (!isEditing) return; // 🔥 prevent unwanted change
+        if (!isEditing) return;
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // ✅ SAVE ONLY WHEN CLICK SAVE
-    const handleSave = async (e) => {
-        e.preventDefault();
-
-        if (!isEditing) return; // 🔥 main fix
+    const handleSave = async () => {
+        if (!isEditing) return;
 
         const token = localStorage.getItem('token');
 
-        try {
-            await axios.put(
-                `${API_BASE}/api/auth/profile`,
-                {
-                    ...formData,
-                    skills: formData.skills.split(',').map(s => s.trim())
-                },
-                { headers: { 'x-auth-token': token } }
-            );
+        await axios.put(
+            `${API_BASE}/api/auth/profile`,
+            {
+                ...formData,
+                skills: formData.skills.split(',').map(s => s.trim())
+            },
+            { headers: { 'x-auth-token': token } }
+        );
 
-            setIsEditing(false);
-            alert("✅ Profile Updated Successfully!");
-
-        } catch (err) {
-            console.error(err);
-            alert("❌ Error updating profile");
-        }
+        setIsEditing(false);
+        alert("Updated");
     };
 
     if (!user) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
 
     return (
-        <div style={{
-            minHeight: "100vh",
-            background: "#f8fafc"
-        }}>
+        <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
 
-            {/* NAVBAR */}
             <nav style={{
                 background: "white",
                 padding: "15px 30px",
@@ -127,15 +106,14 @@ const Profile = () => {
                 padding: "20px"
             }}>
 
-                {/* CARD */}
                 <div style={{
-                    background: "linear-gradient(135deg, #ffecd2, #fcb69f)",
+                    background: "linear-gradient(135deg, #ff9a9e, #fad0c4)",
                     borderRadius: "20px",
                     padding: "30px",
                     boxShadow: "0 15px 35px rgba(0,0,0,0.1)"
                 }}>
 
-                    {/* 🔥 PROFILE CIRCLE */}
+                    {/* CIRCLE ONLY */}
                     <div style={{
                         display: "flex",
                         justifyContent: "center",
@@ -157,11 +135,11 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSave}>
+                    <div>
 
                         <Section title="Personal Info">
                             <Input name="city" value={formData.city} onChange={handleChange} disabled={!isEditing} placeholder="City" />
-                            <Input name="bio" value={formData.bio} onChange={handleChange} disabled={!isEditing} placeholder="About you..." />
+                            <Input name="bio" value={formData.bio} onChange={handleChange} disabled={!isEditing} placeholder="About you" />
                         </Section>
 
                         <Section title="Academic">
@@ -171,34 +149,35 @@ const Profile = () => {
                         </Section>
 
                         <Section title="Skills">
-                            <Input name="skills" value={formData.skills} onChange={handleChange} disabled={!isEditing} placeholder="React, Node..." />
+                            <Input name="skills" value={formData.skills} onChange={handleChange} disabled={!isEditing} placeholder="Skills" />
                         </Section>
 
-                        <Section title="Social Links">
-                            <Input name="linkedin" value={formData.linkedin} onChange={handleChange} disabled={!isEditing} placeholder="LinkedIn URL" />
-                            <Input name="github" value={formData.github} onChange={handleChange} disabled={!isEditing} placeholder="GitHub URL" />
+                        <Section title="Social">
+                            <Input name="linkedin" value={formData.linkedin} onChange={handleChange} disabled={!isEditing} placeholder="LinkedIn" />
+                            <Input name="github" value={formData.github} onChange={handleChange} disabled={!isEditing} placeholder="GitHub" />
                         </Section>
 
                         <div style={{ textAlign: "center", marginTop: "25px" }}>
                             {!isEditing ? (
                                 <button
-                                    type="button"   // 🔥 VERY IMPORTANT
+                                    type="button"
                                     onClick={() => setIsEditing(true)}
                                     style={btnBlack}
                                 >
-                                    Edit Profile
+                                    Edit
                                 </button>
                             ) : (
                                 <button
-                                    type="submit"
+                                    type="button"
+                                    onClick={handleSave}
                                     style={btnPink}
                                 >
-                                    Save Changes
+                                    Save
                                 </button>
                             )}
                         </div>
 
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -207,7 +186,7 @@ const Profile = () => {
 
 const Section = ({ title, children }) => (
     <div style={{ marginBottom: "20px" }}>
-        <h3 style={{ marginBottom: "10px" }}>{title}</h3>
+        <h3>{title}</h3>
         {children}
     </div>
 );
