@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SidebarMenu from '../components/SidebarMenu';
 import ProjectLogo from '../components/Logo';
 
-const API_BASE = "https://decision-making-system.onrender.com";
+const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
 const History = () => {
     const [history, setHistory] = useState([]);

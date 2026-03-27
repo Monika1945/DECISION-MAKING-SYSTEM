@@ -8,7 +8,7 @@ const Login = () => {
     const [isLinkHovered, setIsLinkHovered] = useState(false);
     const navigate = useNavigate();
 
-    const API_BASE = "https://decision-making-system.onrender.com";
+    const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 

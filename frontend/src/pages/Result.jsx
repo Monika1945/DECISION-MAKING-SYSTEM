@@ -9,7 +9,7 @@ import ProjectLogo from '../components/Logo';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // ✅ Use deployed API
-const API_BASE = "https://decision-making-system.onrender.com";
+const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
 const Result = () => {
     const [result, setResult] = useState(null);
