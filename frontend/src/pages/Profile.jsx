@@ -107,7 +107,7 @@ const Profile = () => {
             }}>
 
                 <div style={{
-                    background: "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+                    background: "linear-gradient(135deg, #2193b0, #6dd5ed)",
                     borderRadius: "20px",
                     padding: "30px",
                     boxShadow: "0 15px 35px rgba(0,0,0,0.1)"
@@ -123,7 +123,7 @@ const Profile = () => {
                             width: "90px",
                             height: "90px",
                             borderRadius: "50%",
-                            background: "linear-gradient(135deg, #2193b0, #6dd5ed)",
+                            background: "linear-gradient(135deg, #ff512f, #dd2476)",
                             color: "white",
                             fontSize: "36px",
                             fontWeight: "bold",
