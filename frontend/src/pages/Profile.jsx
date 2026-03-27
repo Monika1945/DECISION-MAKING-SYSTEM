@@ -123,7 +123,7 @@ const Profile = () => {
                             width: "90px",
                             height: "90px",
                             borderRadius: "50%",
-                            background: "linear-gradient(135deg, #ff512f, #dd2476)",
+                            background: "linear-gradient(135deg, #2193b0, #6dd5ed)",
                             color: "white",
                             fontSize: "36px",
                             fontWeight: "bold",
