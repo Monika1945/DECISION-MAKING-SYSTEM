@@ -29,7 +29,6 @@ const Profile = () => {
 
     const navigate = useNavigate();
 
-    // 🔹 FETCH USER
     useEffect(() => {
         const fetchUser = async () => {
             const token = localStorage.getItem('token');
@@ -68,12 +67,10 @@ const Profile = () => {
         fetchUser();
     }, [navigate]);
 
-    // 🔹 INPUT CHANGE
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // 🔹 SAVE PROFILE
     const handleSave = async (e) => {
         e.preventDefault();
 
@@ -90,7 +87,7 @@ const Profile = () => {
             );
 
             setIsEditing(false);
-            alert("✅ Profile Updated Successfully!");
+            alert("✅ Profile Updated!");
 
         } catch (err) {
             alert("❌ Error updating profile");
@@ -103,12 +100,13 @@ const Profile = () => {
         <div style={{
             minHeight: "100vh",
             background: "linear-gradient(135deg, #667eea, #764ba2)",
+            backgroundAttachment: "fixed",
             paddingBottom: "50px"
         }}>
 
             {/* NAVBAR */}
             <nav style={{
-                background: "rgba(255,255,255,0.1)",
+                background: "rgba(255,255,255,0.15)",
                 backdropFilter: "blur(10px)",
                 padding: "15px 30px",
                 display: "flex",
@@ -119,13 +117,13 @@ const Profile = () => {
                 <SidebarMenu />
             </nav>
 
-            {/* MAIN */}
             <div style={{
                 maxWidth: "900px",
                 margin: "40px auto",
                 padding: "20px"
             }}>
 
+                {/* CARD */}
                 <div style={{
                     background: "white",
                     borderRadius: "15px",
@@ -204,7 +202,6 @@ const Profile = () => {
     );
 };
 
-// 🔹 COMPONENTS
 const Section = ({ title, children }) => (
     <div style={{ marginBottom: "25px" }}>
         <h3 style={{
@@ -247,4 +244,4 @@ const btnBlue = {
     border: "none"
 };
 
-export default Profile; 
+export default Profile;
