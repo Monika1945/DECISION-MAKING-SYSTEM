@@ -67,6 +67,7 @@ const Profile = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
+
         const token = localStorage.getItem('token');
 
         await axios.put(`${API_BASE}/api/auth/profile`, {
@@ -77,7 +78,7 @@ const Profile = () => {
         });
 
         setIsEditing(false);
-        alert("✅ Profile Updated!");
+        alert("Profile updated!");
     };
 
     if (!user) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
@@ -85,7 +86,7 @@ const Profile = () => {
     return (
         <div style={{
             minHeight: "100vh",
-            background: "#f1f5f9"
+            background: "#f3f4f6"   // ✅ outside white/gray same
         }}>
 
             {/* NAVBAR */}
@@ -94,7 +95,7 @@ const Profile = () => {
                 padding: "15px 30px",
                 display: "flex",
                 justifyContent: "space-between",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+                boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
             }}>
                 <Link to="/dashboard"><ProjectLogo /></Link>
                 <SidebarMenu />
@@ -106,35 +107,18 @@ const Profile = () => {
                 padding: "20px"
             }}>
 
-                {/* CARD */}
+                {/* 🔥 INSIDE BOX GRADIENT */}
                 <div style={{
-                    background: "linear-gradient(135deg, #dfe9f3, #ffffff)",
-                    borderRadius: "20px",
+                    background: "linear-gradient(135deg, #e0eafc, #cfdef3)",  // 👈 LIGHT GRADIENT
+                    borderRadius: "15px",
                     padding: "30px",
-                    boxShadow: "0 15px 35px rgba(0,0,0,0.1)"
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
                 }}>
 
-                    {/* 🔥 ONLY CIRCLE */}
-                    <div style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginBottom: "25px"
-                    }}>
-                        <div style={{
-                            width: "90px",
-                            height: "90px",
-                            borderRadius: "50%",
-                            background: "linear-gradient(135deg, #667eea, #764ba2)",
-                            color: "white",
-                            fontSize: "36px",
-                            fontWeight: "bold",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: "0 8px 20px rgba(0,0,0,0.2)"
-                        }}>
-                            {formData.name?.charAt(0)?.toUpperCase()}
-                        </div>
+                    {/* HEADER */}
+                    <div style={{ textAlign: "center", marginBottom: "25px" }}>
+                        <h2>{formData.name}</h2>
+                        <p>{formData.email}</p>
                     </div>
 
                     <form onSubmit={handleSave}>
@@ -162,11 +146,11 @@ const Profile = () => {
                         <div style={{ textAlign: "center", marginTop: "25px" }}>
                             {!isEditing ? (
                                 <button type="button" onClick={() => setIsEditing(true)} style={btnBlack}>
-                                    Edit Profile
+                                    Edit
                                 </button>
                             ) : (
                                 <button type="submit" style={btnBlue}>
-                                    Save Changes
+                                    Save
                                 </button>
                             )}
                         </div>
@@ -180,10 +164,7 @@ const Profile = () => {
 
 const Section = ({ title, children }) => (
     <div style={{ marginBottom: "20px" }}>
-        <h3 style={{
-            marginBottom: "10px",
-            color: "#4f46e5"
-        }}>{title}</h3>
+        <h3 style={{ marginBottom: "10px" }}>{title}</h3>
         {children}
     </div>
 );
@@ -193,28 +174,27 @@ const Input = (props) => (
         {...props}
         style={{
             width: "100%",
-            padding: "12px",
+            padding: "10px",
             marginTop: "8px",
-            borderRadius: "10px",
-            border: "1px solid #ddd",
-            outline: "none"
+            borderRadius: "8px",
+            border: "1px solid #ccc"
         }}
     />
 );
 
 const btnBlack = {
-    background: "#111827",
+    background: "black",
     color: "white",
-    padding: "12px 25px",
-    borderRadius: "10px",
+    padding: "10px 20px",
+    borderRadius: "8px",
     border: "none"
 };
 
 const btnBlue = {
-    background: "linear-gradient(135deg, #667eea, #764ba2)",
+    background: "#2563eb",
     color: "white",
-    padding: "12px 25px",
-    borderRadius: "10px",
+    padding: "10px 20px",
+    borderRadius: "8px",
     border: "none"
 };
 
