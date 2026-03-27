@@ -148,7 +148,7 @@ const Profile = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 relative overflow-x-hidden">
+        <div className="min-h-screen bg-slate-50">
 
             {/* NAVBAR */}
             <nav className="bg-white px-6 py-4 flex justify-between items-center shadow">
@@ -174,35 +174,53 @@ const Profile = () => {
 
                 <form onSubmit={handleSave} className="space-y-6">
 
-                    {/* NAME */}
+                    <input name="name" value={formData.name} onChange={handleChange} disabled={!isEditing} placeholder="Name" className="w-full p-3 border rounded" />
+
+                    <input name="city" value={formData.city} onChange={handleChange} disabled={!isEditing} placeholder="City" className="w-full p-3 border rounded" />
+
+                    <textarea name="skills" value={formData.skills} onChange={handleChange} disabled={!isEditing} placeholder="Skills (comma separated)" className="w-full p-3 border rounded" />
+
+                    {/* ✅ LINKEDIN */}
                     <input
-                        name="name"
-                        value={formData.name}
+                        name="linkedin"
+                        value={formData.linkedin}
                         onChange={handleChange}
                         disabled={!isEditing}
-                        placeholder="Name"
+                        placeholder="LinkedIn Profile URL"
                         className="w-full p-3 border rounded"
                     />
 
-                    {/* CITY */}
+                    {/* ✅ GITHUB */}
                     <input
-                        name="city"
-                        value={formData.city}
+                        name="github"
+                        value={formData.github}
                         onChange={handleChange}
                         disabled={!isEditing}
-                        placeholder="City"
+                        placeholder="GitHub Profile URL"
                         className="w-full p-3 border rounded"
                     />
 
-                    {/* SKILLS */}
-                    <textarea
-                        name="skills"
-                        value={formData.skills}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        placeholder="Skills (comma separated)"
-                        className="w-full p-3 border rounded"
-                    />
+                    {/* ✅ DISPLAY LINKS */}
+                    {!isEditing && (
+                        <div className="space-y-2">
+                            {user.linkedin && (
+                                <p>
+                                    LinkedIn: 
+                                    <a href={user.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 ml-2">
+                                        View Profile
+                                    </a>
+                                </p>
+                            )}
+                            {user.github && (
+                                <p>
+                                    GitHub: 
+                                    <a href={user.github} target="_blank" rel="noreferrer" className="text-blue-600 ml-2">
+                                        View Profile
+                                    </a>
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     {/* COMPETENCIES */}
                     <div>
@@ -219,54 +237,26 @@ const Profile = () => {
 
                         {isEditing && (
                             <div className="flex gap-2 mt-2">
-                                <input
-                                    placeholder="Skill"
-                                    value={newCompetency.skill}
-                                    onChange={(e) =>
-                                        setNewCompetency({ ...newCompetency, skill: e.target.value })
-                                    }
-                                />
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="5"
-                                    value={newCompetency.rating}
-                                    onChange={(e) =>
-                                        setNewCompetency({
-                                            ...newCompetency,
-                                            rating: parseInt(e.target.value) || 1
-                                        })
-                                    }
-                                />
+                                <input placeholder="Skill" value={newCompetency.skill}
+                                    onChange={(e) => setNewCompetency({ ...newCompetency, skill: e.target.value })} />
+                                <input type="number" min="1" max="5" value={newCompetency.rating}
+                                    onChange={(e) => setNewCompetency({ ...newCompetency, rating: parseInt(e.target.value) || 1 })} />
                                 <button type="button" onClick={handleAddCompetency}>Add</button>
                             </div>
                         )}
                     </div>
 
-                    {/* BUTTONS */}
                     {!isEditing ? (
-                        <button
-                            type="button"
-                            onClick={() => setIsEditing(true)}
-                            className="bg-black text-white px-4 py-2 rounded"
-                        >
+                        <button type="button" onClick={() => setIsEditing(true)} className="bg-black text-white px-4 py-2 rounded">
                             Edit
                         </button>
                     ) : (
                         <div className="flex gap-4">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="bg-blue-600 text-white px-4 py-2 rounded"
-                            >
+                            <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded">
                                 {loading ? 'Saving...' : 'Save'}
                             </button>
 
-                            <button
-                                type="button"
-                                onClick={() => setIsEditing(false)}
-                                className="bg-gray-300 px-4 py-2 rounded"
-                            >
+                            <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-300 px-4 py-2 rounded">
                                 Cancel
                             </button>
                         </div>
