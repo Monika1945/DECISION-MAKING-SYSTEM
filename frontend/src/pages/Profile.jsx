@@ -6,6 +6,20 @@ import ProjectLogo from '../components/Logo';
 
 const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
+const inputStyle = {
+    width: "100%",
+    padding: "10px",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    marginTop: "8px"
+};
+
+const sectionTitle = {
+    fontWeight: "600",
+    fontSize: "18px",
+    marginBottom: "10px"
+};
+
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -22,7 +36,6 @@ const Profile = () => {
         linkedin: '',
         github: '',
         portfolio: '',
-        resume: '',
         bio: '',
         experience: '',
         projects: ''
@@ -53,7 +66,6 @@ const Profile = () => {
                 linkedin: res.data?.linkedin || '',
                 github: res.data?.github || '',
                 portfolio: res.data?.portfolio || '',
-                resume: res.data?.resume || '',
                 bio: res.data?.bio || '',
                 experience: res.data?.experience || '',
                 projects: res.data?.projects || ''
@@ -85,85 +97,106 @@ const Profile = () => {
         alert("Profile updated!");
     };
 
-    if (!user) return <div className="text-center mt-20">Loading...</div>;
+    if (!user) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div style={{ minHeight: "100vh", background: "#f3f4f6" }}>
 
             {/* NAVBAR */}
-            <nav className="bg-white px-6 py-4 flex justify-between shadow">
+            <nav style={{
+                background: "white",
+                padding: "16px",
+                display: "flex",
+                justifyContent: "space-between",
+                boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+            }}>
                 <Link to="/dashboard"><ProjectLogo /></Link>
                 <SidebarMenu />
             </nav>
 
-            <div className="max-w-5xl mx-auto p-6">
+            <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
 
-                <div className="bg-white rounded-xl shadow p-6">
+                <div style={{
+                    background: "white",
+                    padding: "20px",
+                    borderRadius: "10px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+                }}>
 
-                    <h1 className="text-3xl font-bold mb-6">👤 Profile</h1>
+                    <h1 style={{ fontSize: "28px", marginBottom: "20px" }}>👤 Profile</h1>
 
-                    <form onSubmit={handleSave} className="space-y-6">
+                    <form onSubmit={handleSave}>
 
                         {/* PERSONAL */}
                         <div>
-                            <h2 className="font-semibold text-lg mb-2">Personal Info</h2>
+                            <h2 style={sectionTitle}>Personal Info</h2>
 
-                            <input name="name" value={formData.name} onChange={handleChange} disabled={!isEditing} placeholder="Name" className="input" />
-                            <input name="email" value={formData.email} onChange={handleChange} disabled={!isEditing} placeholder="Email" className="input mt-2" />
-                            <input name="city" value={formData.city} onChange={handleChange} disabled={!isEditing} placeholder="City" className="input mt-2" />
-
-                            <textarea name="bio" value={formData.bio} onChange={handleChange} disabled={!isEditing} placeholder="About you..." className="input mt-2" />
+                            <input name="name" value={formData.name} onChange={handleChange} disabled={!isEditing} placeholder="Name" style={inputStyle} />
+                            <input name="email" value={formData.email} onChange={handleChange} disabled={!isEditing} placeholder="Email" style={inputStyle} />
+                            <input name="city" value={formData.city} onChange={handleChange} disabled={!isEditing} placeholder="City" style={inputStyle} />
+                            <textarea name="bio" value={formData.bio} onChange={handleChange} disabled={!isEditing} placeholder="About you..." style={inputStyle} />
                         </div>
 
                         {/* ACADEMIC */}
-                        <div>
-                            <h2 className="font-semibold text-lg mb-2">Academic</h2>
+                        <div style={{ marginTop: "20px" }}>
+                            <h2 style={sectionTitle}>Academic</h2>
 
-                            <input name="college" value={formData.college} onChange={handleChange} disabled={!isEditing} placeholder="College" className="input" />
-                            <input name="department" value={formData.department} onChange={handleChange} disabled={!isEditing} placeholder="Department" className="input mt-2" />
-                            <input name="cgpa" value={formData.cgpa} onChange={handleChange} disabled={!isEditing} placeholder="CGPA" className="input mt-2" />
+                            <input name="college" value={formData.college} onChange={handleChange} disabled={!isEditing} placeholder="College" style={inputStyle} />
+                            <input name="department" value={formData.department} onChange={handleChange} disabled={!isEditing} placeholder="Department" style={inputStyle} />
+                            <input name="cgpa" value={formData.cgpa} onChange={handleChange} disabled={!isEditing} placeholder="CGPA" style={inputStyle} />
                         </div>
 
                         {/* SKILLS */}
-                        <div>
-                            <h2 className="font-semibold text-lg mb-2">Skills</h2>
-
-                            <textarea name="skills" value={formData.skills} onChange={handleChange} disabled={!isEditing} placeholder="React, Node, SQL..." className="input" />
+                        <div style={{ marginTop: "20px" }}>
+                            <h2 style={sectionTitle}>Skills</h2>
+                            <textarea name="skills" value={formData.skills} onChange={handleChange} disabled={!isEditing} placeholder="React, Node..." style={inputStyle} />
                         </div>
 
                         {/* SOCIAL */}
-                        <div>
-                            <h2 className="font-semibold text-lg mb-2">Social Links</h2>
+                        <div style={{ marginTop: "20px" }}>
+                            <h2 style={sectionTitle}>Social Links</h2>
 
-                            <input name="linkedin" value={formData.linkedin} onChange={handleChange} disabled={!isEditing} placeholder="LinkedIn URL" className="input" />
-                            <input name="github" value={formData.github} onChange={handleChange} disabled={!isEditing} placeholder="GitHub URL" className="input mt-2" />
-                            <input name="portfolio" value={formData.portfolio} onChange={handleChange} disabled={!isEditing} placeholder="Portfolio Website" className="input mt-2" />
+                            <input name="linkedin" value={formData.linkedin} onChange={handleChange} disabled={!isEditing} placeholder="LinkedIn URL" style={inputStyle} />
+                            <input name="github" value={formData.github} onChange={handleChange} disabled={!isEditing} placeholder="GitHub URL" style={inputStyle} />
+                            <input name="portfolio" value={formData.portfolio} onChange={handleChange} disabled={!isEditing} placeholder="Portfolio Website" style={inputStyle} />
                         </div>
 
                         {/* EXPERIENCE */}
-                        <div>
-                            <h2 className="font-semibold text-lg mb-2">Experience</h2>
-
-                            <textarea name="experience" value={formData.experience} onChange={handleChange} disabled={!isEditing} placeholder="Internships / Experience..." className="input" />
+                        <div style={{ marginTop: "20px" }}>
+                            <h2 style={sectionTitle}>Experience</h2>
+                            <textarea name="experience" value={formData.experience} onChange={handleChange} disabled={!isEditing} placeholder="Internships..." style={inputStyle} />
                         </div>
 
                         {/* PROJECTS */}
-                        <div>
-                            <h2 className="font-semibold text-lg mb-2">Projects</h2>
-
-                            <textarea name="projects" value={formData.projects} onChange={handleChange} disabled={!isEditing} placeholder="Your projects..." className="input" />
+                        <div style={{ marginTop: "20px" }}>
+                            <h2 style={sectionTitle}>Projects</h2>
+                            <textarea name="projects" value={formData.projects} onChange={handleChange} disabled={!isEditing} placeholder="Projects..." style={inputStyle} />
                         </div>
 
                         {/* BUTTON */}
-                        {!isEditing ? (
-                            <button type="button" onClick={() => setIsEditing(true)} className="btn-black">
-                                Edit Profile
-                            </button>
-                        ) : (
-                            <button type="submit" className="btn-blue">
-                                Save Changes
-                            </button>
-                        )}
+                        <div style={{ marginTop: "20px" }}>
+                            {!isEditing ? (
+                                <button type="button" onClick={() => setIsEditing(true)} style={{
+                                    background: "black",
+                                    color: "white",
+                                    padding: "10px 20px",
+                                    borderRadius: "8px",
+                                    border: "none"
+                                }}>
+                                    Edit Profile
+                                </button>
+                            ) : (
+                                <button type="submit" style={{
+                                    background: "#2563eb",
+                                    color: "white",
+                                    padding: "10px 20px",
+                                    borderRadius: "8px",
+                                    border: "none"
+                                }}>
+                                    Save Changes
+                                </button>
+                            )}
+                        </div>
 
                     </form>
                 </div>
@@ -173,24 +206,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-.btn-black {
-  background: black;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-}
-
-.btn-blue {
-  background: #2563eb;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-}
