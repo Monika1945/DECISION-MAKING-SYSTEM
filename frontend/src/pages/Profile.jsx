@@ -231,7 +231,7 @@ const styles = {
     },
 
     editBtn: {
-        background: "#f3d9d9ff",
+        background: "#330259ff",
         color: "white",
         padding: "12px 25px",
         borderRadius: "10px",
