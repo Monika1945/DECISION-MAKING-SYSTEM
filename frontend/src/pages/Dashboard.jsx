@@ -10,6 +10,8 @@ const Dashboard = () => {
     const [user, setUser] = useState(null);
     const [latestEval, setLatestEval] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [darkMode, setDarkMode] = useState(true);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -45,111 +47,115 @@ const Dashboard = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-black">
-                <div className="w-14 h-14 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
-    const scoreCategories = [
-        { label: 'Technical', score: latestEval?.technicalScore, max: 50 },
-        { label: 'Aptitude', score: latestEval?.aptitudeScore, max: 30 },
-        { label: 'Communication', score: latestEval?.communicationScore, max: 30 },
-        { label: 'Logical', score: latestEval?.logicalScore, max: 25 },
-        { label: 'Leadership', score: latestEval?.leadershipScore, max: 15 },
-    ];
+    const theme = darkMode
+        ? "bg-black text-white"
+        : "bg-gradient-to-br from-slate-50 to-blue-100 text-gray-900";
 
     return (
-        <div className="min-h-screen bg-black text-white relative overflow-hidden font-[Inter]">
-
-            {/* 🌈 BACKGROUND EFFECT */}
-            <div className="absolute inset-0 -z-10">
-                <div className="absolute w-[500px] h-[500px] bg-purple-600 rounded-full blur-[120px] top-[-100px] left-[-100px] opacity-40"></div>
-                <div className="absolute w-[400px] h-[400px] bg-pink-500 rounded-full blur-[120px] bottom-[-100px] right-[-100px] opacity-40"></div>
-            </div>
+        <div className={`min-h-screen ${theme} transition-all duration-500`}>
 
             {/* NAVBAR */}
-            <nav className="flex justify-between items-center px-8 py-4 bg-white/10 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+            <nav className="flex justify-between items-center px-8 py-4 backdrop-blur-xl border-b border-white/10">
                 <ProjectLogo />
 
                 <div className="flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg">
+
+                    {/* THEME TOGGLE */}
+                    <button
+                        onClick={() => setDarkMode(!darkMode)}
+                        className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition"
+                    >
+                        {darkMode ? "🌙 Dark" : "☀️ Light"}
+                    </button>
+
+                    {/* AVATAR */}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
                         {user?.email?.charAt(0).toUpperCase()}
                     </div>
+
                     <SidebarMenu />
                 </div>
             </nav>
 
+            {/* MAIN */}
             <div className="max-w-6xl mx-auto px-6 py-10">
 
                 {/* HEADER */}
-                <div className="flex justify-between items-center mb-10">
-                    <div>
-                        <h1 className="text-4xl font-extrabold">
-                            Dashboard 🚀
-                        </h1>
-                        <p className="text-gray-400 mt-2">
-                            Welcome back, {user?.name}
-                        </p>
-                    </div>
-
-                    <Link
-                        to="/evaluation"
-                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-semibold shadow-lg hover:scale-105 transition"
-                    >
-                        Retake Test
-                    </Link>
+                <div className="mb-10">
+                    <h1 className="text-4xl font-extrabold">
+                        Welcome back, {user?.name} 👋
+                    </h1>
+                    <p className="text-gray-400 mt-2">
+                        You're doing great 🚀 keep improving your skills everyday
+                    </p>
                 </div>
 
                 {!latestEval ? (
-                    <div className="bg-white/10 backdrop-blur-xl p-12 rounded-3xl text-center shadow-xl border border-white/10">
-                        <h2 className="text-3xl font-bold mb-4">Start Your Journey 🚀</h2>
-                        <p className="text-gray-400 mb-6">Take your first assessment now</p>
+                    <div className="p-10 rounded-3xl backdrop-blur-xl bg-white/10 text-center">
+                        <h2 className="text-2xl font-bold mb-3">
+                            Start your journey 🚀
+                        </h2>
+                        <p className="text-gray-400 mb-6">
+                            Take your first assessment and unlock insights 📊
+                        </p>
 
                         <Link
                             to="/evaluation"
-                            className="px-8 py-3 bg-purple-600 rounded-xl shadow hover:bg-purple-700 transition"
+                            className="px-6 py-3 bg-purple-600 rounded-xl"
                         >
                             Start Now
                         </Link>
                     </div>
                 ) : (
                     <>
-                        {/* SCORE CARD */}
-                        <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-8 border border-white/10 hover:scale-[1.02] transition">
-                            <div className="flex justify-between mb-4">
-                                <span className="text-gray-400 text-sm uppercase font-semibold">
-                                    Placement Readiness
-                                </span>
+                        {/* SCORE */}
+                        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8 hover:scale-[1.02] transition">
+                            <p className="text-sm text-gray-400 mb-2">
+                                Your current readiness status 🎯
+                            </p>
 
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold 
-                                    ${latestEval.status === 'Ready' ? 'bg-green-500/20 text-green-400' :
-                                        latestEval.status === 'Nearly Ready' ? 'bg-yellow-500/20 text-yellow-400' :
-                                            'bg-red-500/20 text-red-400'}`}>
-                                    {latestEval.status}
-                                </span>
-                            </div>
-
-                            <h2 className="text-6xl font-extrabold">
-                                {latestEval.totalScore}
-                                <span className="text-lg text-gray-400"> /150</span>
+                            <h2 className="text-5xl font-bold">
+                                {latestEval.totalScore} / 150
                             </h2>
+
+                            <p className="mt-2 text-green-400">
+                                {latestEval.status} ✅
+                            </p>
                         </div>
 
-                        {/* ANALYTICS */}
-                        <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-8 border border-white/10">
-                            <h3 className="text-lg font-bold mb-6">Performance</h3>
+                        {/* MESSAGE */}
+                        <div className="p-6 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 mb-8">
+                            <p className="text-lg font-semibold">
+                                📈 You're improving consistently! Keep pushing forward 💪
+                            </p>
+                        </div>
 
-                            {scoreCategories.map((cat, i) => (
-                                <div key={i} className="mb-5">
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span>{cat.label}</span>
-                                        <span>{cat.score}/{cat.max}</span>
+                        {/* PERFORMANCE */}
+                        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8">
+                            <h3 className="mb-4 font-bold">Performance Breakdown 📊</h3>
+
+                            {[
+                                { label: 'Technical', score: latestEval.technicalScore, max: 50 },
+                                { label: 'Aptitude', score: latestEval.aptitudeScore, max: 30 },
+                                { label: 'Communication', score: latestEval.communicationScore, max: 30 },
+                                { label: 'Logical', score: latestEval.logicalScore, max: 25 },
+                                { label: 'Leadership', score: latestEval.leadershipScore, max: 15 },
+                            ].map((item, i) => (
+                                <div key={i} className="mb-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span>{item.label}</span>
+                                        <span>{item.score}/{item.max}</span>
                                     </div>
 
-                                    <div className="h-3 bg-white/10 rounded-full">
+                                    <div className="h-2 bg-white/10 rounded-full">
                                         <div
                                             className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
-                                            style={{ width: `${(cat.score / cat.max) * 100}%` }}
+                                            style={{ width: `${(item.score / item.max) * 100}%` }}
                                         />
                                     </div>
                                 </div>
@@ -157,18 +163,14 @@ const Dashboard = () => {
                         </div>
 
                         {/* RECOMMENDATIONS */}
-                        <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-4">Growth Plan</h3>
+                        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl">
+                            <h3 className="font-bold mb-4">Growth Plan 🧠</h3>
 
-                            {latestEval.recommendations?.length > 0 ? (
-                                latestEval.recommendations.map((rec, i) => (
-                                    <div key={i} className="mb-3 p-4 bg-white/10 rounded-xl border border-white/10 hover:bg-white/20 transition">
-                                        {rec}
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-400">You're doing great 🚀</p>
-                            )}
+                            {latestEval.recommendations?.map((rec, i) => (
+                                <div key={i} className="p-3 mb-2 bg-white/10 rounded-lg">
+                                    👉 {rec}
+                                </div>
+                            ))}
                         </div>
                     </>
                 )}
