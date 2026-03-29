@@ -59,16 +59,29 @@ const Profile = () => {
     const handleSave = async () => {
         const token = localStorage.getItem('token');
 
-        await axios.put(`${API_BASE}/api/auth/profile`,
-            {
-                ...formData,
-                skills: formData.skills.split(',').map(s => s.trim())
-            },
-            { headers: { 'x-auth-token': token } }
-        );
+        try {
+            await axios.put(
+                `${API_BASE}/api/auth/profile`,
+                {
+                    ...formData,
+                    skills: formData.skills.split(',').map(s => s.trim())
+                },
+                { headers: { 'x-auth-token': token } }
+            );
 
-        setIsEditing(false);
-        alert("Updated Successfully ✅");
+            setIsEditing(false);
+
+            alert("Updated Successfully ✅");
+
+            // 🚀 Redirect after small delay
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 800);
+
+        } catch (err) {
+            console.error(err);
+            alert("Update failed ❌");
+        }
     };
 
     if (!user) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
@@ -103,7 +116,6 @@ const Profile = () => {
                         {formData.name?.charAt(0)?.toUpperCase()}
                     </div>
 
-                    {/* TITLE */}
                     <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
                         Your Profile 👤
                     </h2>
@@ -197,17 +209,11 @@ const styles = {
         padding: "30px",
         borderRadius: "20px",
         backdropFilter: "blur(20px)",
-
-        // 💎 glass look
-        background: "rgba(240, 187, 187, 0.08)",
+        background: "rgba(255, 255, 255, 0.08)",
         border: "1px solid rgba(255,255,255,0.15)",
-
-        // 🔥 depth
         boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-
-        // ✨ glow
         outline: "1px solid rgba(255,255,255,0.05)"
-    },   // ⚠️ THIS COMMA IMPORTANT
+    },
 
     avatar: {
         width: "90px",
@@ -254,7 +260,7 @@ const light = {
     bg: "#f8fafc",
     text: "#111",
     card: "rgba(255,255,255,0.9)",
-border: "1px solid rgba(0,0,0,0.08)",
+    border: "1px solid rgba(0,0,0,0.08)",
     inputBg: "#fff"
 };
 
