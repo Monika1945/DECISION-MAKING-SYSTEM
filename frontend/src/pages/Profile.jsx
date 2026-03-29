@@ -199,7 +199,7 @@ const styles = {
         backdropFilter: "blur(20px)",
 
         // 💎 glass look
-        background: "rgba(255, 255, 255, 0.08)",
+        background: "rgba(240, 187, 187, 0.08)",
         border: "1px solid rgba(255,255,255,0.15)",
 
         // 🔥 depth
