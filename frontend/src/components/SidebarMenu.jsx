@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
 const SidebarMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredLink, setHoveredLink] = useState(null);
     const [isMenuBtnHovered, setIsMenuBtnHovered] = useState(false);
+
     const navigate = useNavigate();
+    const location = useLocation(); // 🔥 active page detect
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -15,16 +17,19 @@ const SidebarMenu = () => {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
+    // 🔥 UPDATED NAV ITEMS
     const navItems = [
+        { path: '/dashboard', label: 'Dashboard 🏠' },
         { path: '/', label: 'Home' },
-        { path: '/profile', label: 'Profile' },
-        { path: '/history', label: 'History' },
-        { path: '/about', label: 'About' },
+        { path: '/profile', label: 'Profile 👤' },
+        { path: '/history', label: 'History 📜' },
+        { path: '/about', label: 'About ℹ️' },
     ];
 
     return (
         <div style={styles.container}>
-            {/* Hamburger Icon */}
+
+            {/* ☰ BUTTON */}
             <button
                 onClick={toggleMenu}
                 onMouseEnter={() => setIsMenuBtnHovered(true)}
@@ -33,69 +38,73 @@ const SidebarMenu = () => {
                     ...styles.menuBtn,
                     ...(isMenuBtnHovered ? styles.menuBtnHover : {})
                 }}
-                aria-label="Toggle Menu"
             >
                 <div style={{
                     ...styles.hamburgerLine,
                     ...(isOpen ? { transform: 'rotate(45deg) translateY(8px)' } : {})
                 }}></div>
+
                 <div style={{
                     ...styles.hamburgerLine,
                     ...(isOpen ? { opacity: 0 } : {})
                 }}></div>
+
                 <div style={{
                     ...styles.hamburgerLine,
                     ...(isOpen ? { transform: 'rotate(-45deg) translateY(-8px)' } : {})
                 }}></div>
             </button>
 
-            {/* Portal for Overlay and Sidebar */}
+            {/* PORTAL */}
             {createPortal(
                 <>
-                    {/* Overlay */}
+                    {/* OVERLAY */}
                     {isOpen && (
-                        <div
-                            style={styles.overlay}
-                            onClick={toggleMenu}
-                        ></div>
+                        <div style={styles.overlay} onClick={toggleMenu}></div>
                     )}
 
-                    {/* Sidebar */}
+                    {/* SIDEBAR */}
                     <div style={{
                         ...styles.sidebar,
                         transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
                         pointerEvents: isOpen ? 'auto' : 'none'
                     }}>
+
                         <div style={styles.sidebarContent}>
+
+                            {/* HEADER */}
                             <div style={styles.sidebarHeader}>
-                                <span style={styles.menuTitle}>Menu</span>
-                                <button
-                                    onClick={toggleMenu}
-                                    style={styles.closeBtn}
-                                    onMouseEnter={(e) => e.target.style.color = '#4b5563'}
-                                    onMouseLeave={(e) => e.target.style.color = '#9ca3af'}
-                                >
-                                    ✕
-                                </button>
+                                <span style={styles.menuTitle}>Menu 🚀</span>
+                                <button onClick={toggleMenu} style={styles.closeBtn}>✕</button>
                             </div>
 
+                            {/* NAV */}
                             <nav style={styles.nav}>
-                                {navItems.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={toggleMenu}
-                                        onMouseEnter={() => setHoveredLink(item.path)}
-                                        onMouseLeave={() => setHoveredLink(null)}
-                                        style={{
-                                            ...styles.navItem,
-                                            ...(hoveredLink === item.path ? styles.navItemHover : {})
-                                        }}
-                                    >
-                                        {item.label}
-                                    </Link>
-                                ))}
+                                {navItems.map((item) => {
+
+                                    const isActive = location.pathname === item.path;
+
+                                    return (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            onClick={toggleMenu}
+                                            onMouseEnter={() => setHoveredLink(item.path)}
+                                            onMouseLeave={() => setHoveredLink(null)}
+                                            style={{
+                                                ...styles.navItem,
+                                                ...(hoveredLink === item.path ? styles.navItemHover : {}),
+                                                ...(isActive ? styles.activeLink : {})
+                                            }}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    );
+                                })}
+
                                 <div style={styles.divider}></div>
+
+                                {/* LOGOUT */}
                                 <button
                                     onClick={handleLogout}
                                     onMouseEnter={() => setHoveredLink('logout')}
@@ -105,9 +114,10 @@ const SidebarMenu = () => {
                                         ...(hoveredLink === 'logout' ? styles.logoutBtnHover : {})
                                     }}
                                 >
-                                    Logout
+                                    Logout 🚪
                                 </button>
                             </nav>
+
                         </div>
                     </div>
                 </>,
@@ -117,113 +127,112 @@ const SidebarMenu = () => {
     );
 };
 
+/* STYLES */
 const styles = {
-    container: {
-        position: 'relative',
-    },
+    container: { position: 'relative' },
+
     menuBtn: {
         padding: '0.5rem',
         color: '#1f2937',
-        backgroundColor: 'transparent',
+        background: 'transparent',
         border: 'none',
         cursor: 'pointer',
-        transition: 'color 0.2s',
         display: 'flex',
         flexDirection: 'column',
         gap: '4px',
-        zIndex: 50,
-        position: 'relative',
-        outline: 'none',
     },
-    menuBtnHover: {
-        color: '#2563eb',
-    },
+
+    menuBtnHover: { color: '#7c3aed' },
+
     hamburgerLine: {
         width: '1.5rem',
         height: '4px',
         backgroundColor: 'currentColor',
-        transition: 'all 0.3s ease-in-out',
         borderRadius: '2px',
+        transition: '0.3s'
     },
+
     overlay: {
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.2)',
-        backdropFilter: 'blur(4px)',
-        zIndex: 999,
-        transition: 'opacity 0.3s',
+        background: 'rgba(0,0,0,0.3)',
+        backdropFilter: 'blur(6px)',
+        zIndex: 999
     },
+
     sidebar: {
         position: 'fixed',
         top: 0,
         right: 0,
         height: '100vh',
-        width: '16rem',
-        backgroundColor: 'white',
-        boxShadow: '-10px 0 15px -3px rgba(0, 0, 0, 0.1)',
+        width: '260px',
+        background: 'linear-gradient(135deg, #ffffff, #f3f4f6)',
+        boxShadow: '-10px 0 30px rgba(0,0,0,0.15)',
         zIndex: 1000,
-        transition: 'transform 0.3s ease-in-out',
-        overflowY: 'auto',
+        transition: '0.3s'
     },
-    sidebarContent: {
-        padding: '1.5rem',
-    },
+
+    sidebarContent: { padding: '1.5rem' },
+
     sidebarHeader: {
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '2.5rem',
+        marginBottom: '2rem'
     },
+
     menuTitle: {
         fontWeight: 'bold',
-        fontSize: '1.25rem',
-        color: '#1f2937',
+        fontSize: '1.3rem'
     },
+
     closeBtn: {
-        backgroundColor: 'transparent',
         border: 'none',
-        fontSize: '1.25rem',
-        color: '#9ca3af',
+        background: 'transparent',
         cursor: 'pointer',
-        transition: 'color 0.2s',
+        fontSize: '1.2rem'
     },
+
     nav: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '1rem',
+        gap: '12px'
     },
+
     navItem: {
-        display: 'block',
-        padding: '0.5rem 1rem',
-        color: '#4b5563',
+        padding: '10px 14px',
+        borderRadius: '10px',
         textDecoration: 'none',
-        borderRadius: '0.5rem',
-        transition: 'all 0.2s',
-        fontWeight: '500',
+        color: '#374151',
+        transition: '0.2s'
     },
+
     navItemHover: {
-        backgroundColor: '#eff6ff',
-        color: '#2563eb',
+        background: '#ede9fe',
+        color: '#7c3aed'
     },
+
+    activeLink: {
+        background: '#7c3aed',
+        color: 'white'
+    },
+
     divider: {
-        borderTop: '1px solid #f3f4f6',
-        margin: '1rem 0',
+        borderTop: '1px solid #e5e7eb',
+        margin: '10px 0'
     },
+
     logoutBtn: {
-        width: '100%',
-        textAlign: 'left',
-        padding: '0.5rem 1rem',
-        color: '#ef4444',
-        backgroundColor: 'transparent',
+        padding: '10px',
         border: 'none',
-        borderRadius: '0.5rem',
+        background: 'transparent',
+        color: '#ef4444',
         cursor: 'pointer',
-        transition: 'all 0.2s',
-        fontWeight: '500',
+        borderRadius: '10px'
     },
+
     logoutBtnHover: {
-        backgroundColor: '#fef2f2',
-    },
+        background: '#fee2e2'
+    }
 };
 
 export default SidebarMenu;
