@@ -11,8 +11,7 @@ const Signup = () => {
         password: '',
         department: '',
         year: '',
-        cgpa: '',
-        backlogs: 0
+        
     });
 
     const [loading, setLoading] = useState(false);
@@ -104,30 +103,6 @@ const Signup = () => {
                         <div style={styles.col}>
                             <label style={styles.label}>Year</label>
                             <input name="year" onChange={handleChange} style={styles.input} />
-                        </div>
-                    </div>
-
-                    <div style={styles.row}>
-                        <div style={styles.col}>
-                            <label style={styles.label}>CGPA *</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                name="cgpa"
-                                onChange={handleChange}
-                                style={styles.input}
-                                required
-                            />
-                        </div>
-                        <div style={styles.col}>
-                            <label style={styles.label}>Backlogs *</label>
-                            <input
-                                type="number"
-                                name="backlogs"
-                                onChange={handleChange}
-                                style={styles.input}
-                                required
-                            />
                         </div>
                     </div>
 
