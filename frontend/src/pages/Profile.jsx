@@ -9,22 +9,12 @@ const API_BASE = "https://decision-backend-pl2m.onrender.com";
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [darkMode, setDarkMode] = useState(true);
 
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        city: '',
-        college: '',
-        cgpa: '',
-        department: '',
-        year: '',
-        skills: '',
-        linkedin: '',
-        github: '',
-        portfolio: '',
-        bio: '',
-        experience: '',
-        projects: ''
+        name: '', email: '', city: '', college: '', cgpa: '',
+        department: '', year: '', skills: '', linkedin: '',
+        github: '', portfolio: '', bio: '', experience: '', projects: ''
     });
 
     const navigate = useNavigate();
@@ -67,12 +57,9 @@ const Profile = () => {
     };
 
     const handleSave = async () => {
-        if (!isEditing) return;
-
         const token = localStorage.getItem('token');
 
-        await axios.put(
-            `${API_BASE}/api/auth/profile`,
+        await axios.put(`${API_BASE}/api/auth/profile`,
             {
                 ...formData,
                 skills: formData.skills.split(',').map(s => s.trim())
@@ -81,143 +68,191 @@ const Profile = () => {
         );
 
         setIsEditing(false);
-        alert("Updated");
+        alert("Updated Successfully ✅");
     };
 
     if (!user) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
 
-    return (
-        <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
+    const theme = darkMode ? dark : light;
 
-            <nav style={{
-                background: "white",
-                padding: "15px 30px",
-                display: "flex",
-                justifyContent: "space-between",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
-            }}>
+    return (
+        <div style={{ ...styles.page, background: theme.bg, color: theme.text }}>
+
+            {/* NAVBAR */}
+            <nav style={{ ...styles.nav, borderBottom: theme.border }}>
                 <Link to="/dashboard"><ProjectLogo /></Link>
-                <SidebarMenu />
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    <button onClick={() => setDarkMode(!darkMode)} style={styles.toggle}>
+                        {darkMode ? "🌙" : "☀️"}
+                    </button>
+                    <SidebarMenu />
+                </div>
             </nav>
 
-            <div style={{
-                maxWidth: "900px",
-                margin: "40px auto",
-                padding: "20px"
-            }}>
-
+            {/* CARD */}
+            <div style={styles.container}>
                 <div style={{
-                    background: "linear-gradient(135deg, #c8e1e8ff, #75d3e9ff)",
-                    borderRadius: "20px",
-                    padding: "30px",
-                    boxShadow: "0 15px 35px rgba(0,0,0,0.1)"
+                    ...styles.card,
+                    background: theme.card,
+                    border: theme.border
                 }}>
 
-                    {/* CIRCLE ONLY */}
-                    <div style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginBottom: "25px"
-                    }}>
-                        <div style={{
-                            width: "90px",
-                            height: "90px",
-                            borderRadius: "50%",
-                            background: "linear-gradient(135deg, #ff512f, #dd2476)",
-                            color: "white",
-                            fontSize: "36px",
-                            fontWeight: "bold",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center"
-                        }}>
-                            {formData.name?.charAt(0)?.toUpperCase()}
-                        </div>
+                    {/* AVATAR */}
+                    <div style={styles.avatar}>
+                        {formData.name?.charAt(0)?.toUpperCase()}
                     </div>
 
-                    <div>
+                    {/* TITLE */}
+                    <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+                        Your Profile 👤
+                    </h2>
 
-                        <Section title="Personal Info">
-                            <Input name="city" value={formData.city} onChange={handleChange} disabled={!isEditing} placeholder="City" />
-                            <Input name="bio" value={formData.bio} onChange={handleChange} disabled={!isEditing} placeholder="About you" />
-                        </Section>
+                    <Section title="Personal Info">
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "city")} placeholder="City" />
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "bio")} placeholder="About you" />
+                    </Section>
 
-                        <Section title="Academic">
-                            <Input name="college" value={formData.college} onChange={handleChange} disabled={!isEditing} placeholder="College" />
-                            <Input name="department" value={formData.department} onChange={handleChange} disabled={!isEditing} placeholder="Department" />
-                            <Input name="cgpa" value={formData.cgpa} onChange={handleChange} disabled={!isEditing} placeholder="CGPA" />
-                        </Section>
+                    <Section title="Academic 🎓">
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "college")} placeholder="College" />
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "department")} placeholder="Department" />
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "cgpa")} placeholder="CGPA" />
+                    </Section>
 
-                        <Section title="Skills">
-                            <Input name="skills" value={formData.skills} onChange={handleChange} disabled={!isEditing} placeholder="Skills" />
-                        </Section>
+                    <Section title="Skills 💡">
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "skills")} placeholder="Skills" />
+                    </Section>
 
-                        <Section title="Social">
-                            <Input name="linkedin" value={formData.linkedin} onChange={handleChange} disabled={!isEditing} placeholder="LinkedIn" />
-                            <Input name="github" value={formData.github} onChange={handleChange} disabled={!isEditing} placeholder="GitHub" />
-                        </Section>
+                    <Section title="Social 🌐">
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "linkedin")} placeholder="LinkedIn" />
+                        <Input {...inputProps(theme, formData, handleChange, isEditing, "github")} placeholder="GitHub" />
+                    </Section>
 
-                        <div style={{ textAlign: "center", marginTop: "25px" }}>
-                            {!isEditing ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setIsEditing(true)}
-                                    style={btnBlack}
-                                >
-                                    Edit
-                                </button>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={handleSave}
-                                    style={btnPink}
-                                >
-                                    Save
-                                </button>
-                            )}
-                        </div>
-
+                    {/* BUTTON */}
+                    <div style={{ textAlign: "center", marginTop: "25px" }}>
+                        {!isEditing ? (
+                            <button onClick={() => setIsEditing(true)} style={styles.editBtn}>
+                                Edit ✏️
+                            </button>
+                        ) : (
+                            <button onClick={handleSave} style={styles.saveBtn}>
+                                Save Changes 💾
+                            </button>
+                        )}
                     </div>
+
                 </div>
             </div>
         </div>
     );
 };
 
+/* INPUT HELPER */
+const inputProps = (theme, formData, handleChange, isEditing, name) => ({
+    name,
+    value: formData[name],
+    onChange: handleChange,
+    disabled: !isEditing,
+    style: {
+        ...styles.input,
+        background: theme.inputBg,
+        color: theme.text,
+        border: theme.border
+    }
+});
+
+/* COMPONENTS */
 const Section = ({ title, children }) => (
     <div style={{ marginBottom: "20px" }}>
-        <h3>{title}</h3>
+        <h3 style={{ marginBottom: "10px" }}>{title}</h3>
         {children}
     </div>
 );
 
-const Input = (props) => (
-    <input
-        {...props}
-        style={{
-            width: "100%",
-            padding: "12px",
-            marginTop: "8px",
-            borderRadius: "10px",
-            border: "1px solid #ddd"
-        }}
-    />
-);
+const Input = (props) => <input {...props} />;
 
-const btnBlack = {
-    background: "#111",
-    color: "white",
-    padding: "12px 25px",
-    borderRadius: "10px",
-    border: "none"
+/* STYLES */
+const styles = {
+    page: { minHeight: "100vh" },
+
+    nav: {
+        padding: "15px 30px",
+        display: "flex",
+        justifyContent: "space-between"
+    },
+
+    toggle: {
+        padding: "6px 10px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer"
+    },
+
+    container: {
+        maxWidth: "900px",
+        margin: "40px auto"
+    },
+
+    card: {
+        padding: "30px",
+        borderRadius: "20px",
+        backdropFilter: "blur(15px)",
+        boxShadow: "0 20px 50px rgba(0,0,0,0.2)"
+    },
+
+    avatar: {
+        width: "90px",
+        height: "90px",
+        borderRadius: "50%",
+        margin: "0 auto 20px",
+        background: "linear-gradient(135deg, #6366f1, #ec4899)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "32px",
+        color: "white",
+        fontWeight: "bold"
+    },
+
+    input: {
+        width: "100%",
+        padding: "12px",
+        marginTop: "8px",
+        borderRadius: "10px"
+    },
+
+    editBtn: {
+        background: "#111",
+        color: "white",
+        padding: "12px 25px",
+        borderRadius: "10px",
+        border: "none"
+    },
+
+    saveBtn: {
+        background: "linear-gradient(135deg, #6366f1, #ec4899)",
+        color: "white",
+        padding: "12px 25px",
+        borderRadius: "10px",
+        border: "none"
+    }
 };
 
-const btnPink = {
-   background: "linear-gradient(135deg, #2193b0, #6dd5ed)",
-    color: "white",
-    padding: "12px 25px",
-    borderRadius: "10px",
-    border: "none"
+/* THEMES */
+const light = {
+    bg: "#f8fafc",
+    text: "#111",
+    card: "rgba(255,255,255,0.8)",
+    border: "1px solid rgba(0,0,0,0.05)",
+    inputBg: "#fff"
+};
+
+const dark = {
+    bg: "#020617",
+    text: "#e5e7eb",
+    card: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    inputBg: "rgba(255,255,255,0.05)"
 };
 
 export default Profile;
