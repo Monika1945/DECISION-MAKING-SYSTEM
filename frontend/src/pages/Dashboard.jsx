@@ -113,19 +113,35 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <>
-                        {/* SCORE */}
+                        {/* SCORE + RETAKE */}
                         <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8 hover:scale-[1.02] transition">
-                            <p className="text-sm text-gray-400 mb-2">
-                                Your current readiness status 🎯
-                            </p>
 
-                            <h2 className="text-5xl font-bold">
-                                {latestEval.totalScore} / 150
-                            </h2>
+                            <div className="flex justify-between items-center">
 
-                            <p className="mt-2 text-green-400">
-                                {latestEval.status} ✅
-                            </p>
+                                <div>
+                                    <p className="text-sm text-gray-400 mb-2">
+                                        Your current readiness status 🎯
+                                    </p>
+
+                                    <h2 className="text-5xl font-bold">
+                                        {latestEval.totalScore} / 150
+                                    </h2>
+
+                                    <p className="mt-2 text-green-400">
+                                        {latestEval.status} ✅
+                                    </p>
+                                </div>
+
+                                {/* 🚀 RETAKE BUTTON */}
+                                <button
+                                    onClick={() => navigate('/evaluation')}
+                                    className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold hover:scale-105 transition"
+                                >
+                                    Retake Test 🔄
+                                </button>
+
+                            </div>
+
                         </div>
 
                         {/* MOTIVATION */}
@@ -135,7 +151,7 @@ const Dashboard = () => {
                             </p>
                         </div>
 
-                        {/* PERFORMANCE (UPGRADED) */}
+                        {/* PERFORMANCE */}
                         <div className="mb-8">
                             <h3 className="text-xl font-bold mb-2">Performance Breakdown 📊</h3>
                             <p className="text-gray-400 mb-6">
