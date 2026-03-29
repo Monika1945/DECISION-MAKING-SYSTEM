@@ -194,20 +194,20 @@ const styles = {
     },
 
     card: {
-    padding: "30px",
-    borderRadius: "20px",
-    backdropFilter: "blur(20px)",
+        padding: "30px",
+        borderRadius: "20px",
+        backdropFilter: "blur(20px)",
 
-    // 👇 main change
-    background: "rgba(255, 255, 255, 0.08)",
-    border: "1px solid rgba(255,255,255,0.15)",
+        // 💎 glass look
+        background: "rgba(255, 255, 255, 0.08)",
+        border: "1px solid rgba(255,255,255,0.15)",
 
-    // 👇 depth kudukkum
-    boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+        // 🔥 depth
+        boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
 
-    // 👇 subtle glow
-    outline: "1px solid rgba(255,255,255,0.05)"
-}
+        // ✨ glow
+        outline: "1px solid rgba(255,255,255,0.05)"
+    },   // ⚠️ THIS COMMA IMPORTANT
 
     avatar: {
         width: "90px",
@@ -235,7 +235,8 @@ const styles = {
         color: "white",
         padding: "12px 25px",
         borderRadius: "10px",
-        border: "none"
+        border: "none",
+        cursor: "pointer"
     },
 
     saveBtn: {
@@ -243,7 +244,8 @@ const styles = {
         color: "white",
         padding: "12px 25px",
         borderRadius: "10px",
-        border: "none"
+        border: "none",
+        cursor: "pointer"
     }
 };
 
