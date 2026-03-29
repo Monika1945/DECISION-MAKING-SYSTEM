@@ -203,7 +203,7 @@ const styles = {
         border: "1px solid rgba(255,255,255,0.15)",
 
         // 🔥 depth
-        boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+        boxShadow: "0 20px 60px rgba(201, 163, 163, 0.5)",
 
         // ✨ glow
         outline: "1px solid rgba(255,255,255,0.05)"
