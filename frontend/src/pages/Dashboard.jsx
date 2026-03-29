@@ -44,8 +44,8 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-                <div className="w-14 h-14 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="min-h-screen flex items-center justify-center bg-black">
+                <div className="w-14 h-14 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -59,81 +59,84 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 font-[Inter]">
+        <div className="min-h-screen bg-black text-white relative overflow-hidden font-[Inter]">
+
+            {/* 🌈 BACKGROUND EFFECT */}
+            <div className="absolute inset-0 -z-10">
+                <div className="absolute w-[500px] h-[500px] bg-purple-600 rounded-full blur-[120px] top-[-100px] left-[-100px] opacity-40"></div>
+                <div className="absolute w-[400px] h-[400px] bg-pink-500 rounded-full blur-[120px] bottom-[-100px] right-[-100px] opacity-40"></div>
+            </div>
 
             {/* NAVBAR */}
-            <nav className="flex justify-between items-center px-8 py-4 bg-white/60 backdrop-blur-xl border-b sticky top-0 z-50">
+            <nav className="flex justify-between items-center px-8 py-4 bg-white/10 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
                 <ProjectLogo />
 
                 <div className="flex items-center gap-4">
-                    {/* Avatar */}
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg">
                         {user?.email?.charAt(0).toUpperCase()}
                     </div>
-
                     <SidebarMenu />
                 </div>
             </nav>
 
-            {/* MAIN */}
             <div className="max-w-6xl mx-auto px-6 py-10">
 
                 {/* HEADER */}
                 <div className="flex justify-between items-center mb-10">
                     <div>
-                        <h1 className="text-4xl font-extrabold text-gray-900">
+                        <h1 className="text-4xl font-extrabold">
                             Dashboard 🚀
                         </h1>
-                        <p className="text-gray-500 mt-2">
+                        <p className="text-gray-400 mt-2">
                             Welcome back, {user?.name}
                         </p>
                     </div>
 
                     <Link
                         to="/evaluation"
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:scale-105 transition"
+                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-semibold shadow-lg hover:scale-105 transition"
                     >
                         Retake Test
                     </Link>
                 </div>
 
                 {!latestEval ? (
-                    <div className="bg-white/70 backdrop-blur-xl p-12 rounded-3xl text-center shadow-xl">
+                    <div className="bg-white/10 backdrop-blur-xl p-12 rounded-3xl text-center shadow-xl border border-white/10">
                         <h2 className="text-3xl font-bold mb-4">Start Your Journey 🚀</h2>
-                        <p className="text-gray-600 mb-6">Take your first assessment now</p>
+                        <p className="text-gray-400 mb-6">Take your first assessment now</p>
 
                         <Link
                             to="/evaluation"
-                            className="px-8 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
+                            className="px-8 py-3 bg-purple-600 rounded-xl shadow hover:bg-purple-700 transition"
                         >
                             Start Now
                         </Link>
                     </div>
                 ) : (
                     <>
-                        {/* SCORE */}
-                        <div className="bg-white/70 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-8">
+                        {/* SCORE CARD */}
+                        <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-8 border border-white/10 hover:scale-[1.02] transition">
                             <div className="flex justify-between mb-4">
                                 <span className="text-gray-400 text-sm uppercase font-semibold">
                                     Placement Readiness
                                 </span>
 
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold 
-                                    ${latestEval.status === 'Ready' ? 'bg-green-100 text-green-700' :
-                                        latestEval.status === 'Nearly Ready' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-red-100 text-red-700'}`}>
+                                    ${latestEval.status === 'Ready' ? 'bg-green-500/20 text-green-400' :
+                                        latestEval.status === 'Nearly Ready' ? 'bg-yellow-500/20 text-yellow-400' :
+                                            'bg-red-500/20 text-red-400'}`}>
                                     {latestEval.status}
                                 </span>
                             </div>
 
-                            <h2 className="text-6xl font-extrabold text-gray-900">
+                            <h2 className="text-6xl font-extrabold">
                                 {latestEval.totalScore}
                                 <span className="text-lg text-gray-400"> /150</span>
                             </h2>
                         </div>
 
                         {/* ANALYTICS */}
-                        <div className="bg-white/70 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-8">
+                        <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-xl mb-8 border border-white/10">
                             <h3 className="text-lg font-bold mb-6">Performance</h3>
 
                             {scoreCategories.map((cat, i) => (
@@ -143,9 +146,9 @@ const Dashboard = () => {
                                         <span>{cat.score}/{cat.max}</span>
                                     </div>
 
-                                    <div className="h-3 bg-gray-200 rounded-full">
+                                    <div className="h-3 bg-white/10 rounded-full">
                                         <div
-                                            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+                                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
                                             style={{ width: `${(cat.score / cat.max) * 100}%` }}
                                         />
                                     </div>
@@ -154,17 +157,17 @@ const Dashboard = () => {
                         </div>
 
                         {/* RECOMMENDATIONS */}
-                        <div className="bg-white/70 backdrop-blur-xl p-8 rounded-3xl shadow-xl">
+                        <div className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-xl border border-white/10">
                             <h3 className="text-xl font-bold mb-4">Growth Plan</h3>
 
                             {latestEval.recommendations?.length > 0 ? (
                                 latestEval.recommendations.map((rec, i) => (
-                                    <div key={i} className="mb-3 p-4 bg-blue-50 rounded-xl">
+                                    <div key={i} className="mb-3 p-4 bg-white/10 rounded-xl border border-white/10 hover:bg-white/20 transition">
                                         {rec}
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-gray-500">You're doing great 🚀</p>
+                                <p className="text-gray-400">You're doing great 🚀</p>
                             )}
                         </div>
                     </>
