@@ -194,11 +194,20 @@ const styles = {
     },
 
     card: {
-        padding: "30px",
-        borderRadius: "20px",
-        backdropFilter: "blur(15px)",
-        boxShadow: "0 20px 50px rgba(0,0,0,0.2)"
-    },
+    padding: "30px",
+    borderRadius: "20px",
+    backdropFilter: "blur(20px)",
+
+    // 👇 main change
+    background: "rgba(255, 255, 255, 0.08)",
+    border: "1px solid rgba(255,255,255,0.15)",
+
+    // 👇 depth kudukkum
+    boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+
+    // 👇 subtle glow
+    outline: "1px solid rgba(255,255,255,0.05)"
+}
 
     avatar: {
         width: "90px",
@@ -242,8 +251,8 @@ const styles = {
 const light = {
     bg: "#f8fafc",
     text: "#111",
-    card: "rgba(255,255,255,0.8)",
-    border: "1px solid rgba(0,0,0,0.05)",
+    card: "rgba(255,255,255,0.9)",
+border: "1px solid rgba(0,0,0,0.08)",
     inputBg: "#fff"
 };
 
