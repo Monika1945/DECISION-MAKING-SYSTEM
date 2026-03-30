@@ -62,20 +62,21 @@ const History = () => {
         fetchHistory();
     }, [navigate]);
 
-    const shareOptions = [
-        {
-            name: "WhatsApp",
-            action: () =>
-                window.open(`https://wa.me/?text=Check my evaluation results 🚀`, "_blank")
-        },
-        {
-            name: "Email",
-            action: () =>
-                window.location.href = "mailto:?subject=My Evaluation&body=Check my results"
-        }
-    ];
+    // 🔄 Loading
+    if (loading) return (
+        <div style={{
+            minHeight: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: t.bg,
+            color: t.text
+        }}>
+            Loading...
+        </div>
+    );
 
-    if (loading) return <div style={{ color: t.text }}>Loading...</div>;
+    // ❌ Error
     if (error) return <div>{error}</div>;
 
     return (
@@ -92,7 +93,10 @@ const History = () => {
                 justifyContent: "space-between",
                 padding: "1rem 2rem",
                 backdropFilter: "blur(20px)",
-                borderBottom: `1px solid ${t.border}`
+                borderBottom: `1px solid ${t.border}`,
+                position: "sticky",
+                top: 0,
+                zIndex: 10
             }}>
                 <Link to="/dashboard">
                     <ProjectLogo />
@@ -105,16 +109,20 @@ const History = () => {
                         <button
                             onClick={() => setShowShare(!showShare)}
                             style={{
-                                fontSize: "18px",
-                                background: t.primary,
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "50%",
-                                padding: "10px",
-                                cursor: "pointer"
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                padding: "8px 14px",
+                                borderRadius: "10px",
+                                border: `1px solid ${t.border}`,
+                                background: t.card,
+                                color: t.text,
+                                cursor: "pointer",
+                                fontWeight: "600"
                             }}
                         >
-                            📤
+                            <span style={{ fontSize: "16px" }}>⤴</span>
+                            Share
                         </button>
 
                         {showShare && (
@@ -123,24 +131,27 @@ const History = () => {
                                 right: 0,
                                 top: "120%",
                                 background: t.card,
-                                backdropFilter: "blur(20px)",
                                 border: `1px solid ${t.border}`,
                                 borderRadius: "12px",
-                                padding: "10px",
+                                padding: "8px",
+                                minWidth: "160px",
                                 boxShadow: "0 10px 30px rgba(0,0,0,0.2)"
                             }}>
-                                {shareOptions.map((opt, i) => (
-                                    <div
-                                        key={i}
-                                        onClick={opt.action}
-                                        style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer"
-                                        }}
-                                    >
-                                        {opt.name}
-                                    </div>
-                                ))}
+
+                                <div
+                                    onClick={() => window.open(`https://wa.me/?text=Check my evaluation 🚀`, "_blank")}
+                                    style={styles.shareItem}
+                                >
+                                    🟢 WhatsApp
+                                </div>
+
+                                <div
+                                    onClick={() => window.location.href = "mailto:?subject=My Evaluation&body=Check this out"}
+                                    style={styles.shareItem}
+                                >
+                                    ✉️ Email
+                                </div>
+
                             </div>
                         )}
                     </div>
@@ -160,15 +171,17 @@ const History = () => {
                         {darkMode ? "🌞" : "🌙"}
                     </button>
 
-                    {/* FIXED SIDEBAR ICON VISIBILITY */}
-                    <div style={{ color: t.text }}>
-                        <SidebarMenu />
-                    </div>
+                    {/* FIXED SIDEBAR */}
+                    <SidebarMenu color={t.text} />
                 </div>
             </nav>
 
-            {/* HEADER */}
-            <div style={{ maxWidth: "900px", margin: "auto", padding: "3rem 1.5rem" }}>
+            {/* CONTENT */}
+            <div style={{
+                maxWidth: "900px",
+                margin: "auto",
+                padding: "3rem 1.5rem"
+            }}>
                 <h1 style={{
                     fontSize: "3rem",
                     fontWeight: "900",
@@ -177,62 +190,80 @@ const History = () => {
                     Evaluation <span style={{ color: t.primary }}>History</span>
                 </h1>
 
-                {/* CARDS */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                    {history.map((item) => (
-                        <div key={item._id} style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            padding: "20px",
-                            borderRadius: "18px",
-                            background: t.card,
-                            backdropFilter: "blur(20px)",
-                            border: `1px solid ${t.border}`,
-                            transition: "0.3s"
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = "translateY(-6px)";
-                            e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.25)";
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "none";
-                            e.currentTarget.style.boxShadow = "none";
-                        }}
-                        >
+                {history.length === 0 ? (
+                    <div style={{ textAlign: "center" }}>
+                        <h2>No History Found</h2>
+                        <Link to="/evaluation">Start Assessment</Link>
+                    </div>
+                ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                        {history.map((item) => (
+                            <div
+                                key={item._id}
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    padding: "20px",
+                                    borderRadius: "18px",
+                                    background: t.card,
+                                    backdropFilter: "blur(20px)",
+                                    border: `1px solid ${t.border}`,
+                                    transition: "0.3s"
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = "translateY(-6px)";
+                                    e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.25)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = "none";
+                                    e.currentTarget.style.boxShadow = "none";
+                                }}
+                            >
+                                <div>
+                                    <h3 style={{ fontSize: "1.4rem", fontWeight: "800" }}>
+                                        {formatDate(item.createdAt)}
+                                    </h3>
+                                    <p style={{ color: t.sub }}>{item.status}</p>
+                                    <p style={{ fontWeight: "600" }}>{item.companyPreference}</p>
+                                </div>
 
-                            <div>
-                                <h3 style={{ fontSize: "1.4rem", fontWeight: "800" }}>
-                                    {formatDate(item.createdAt)}
-                                </h3>
-                                <p style={{ color: t.sub }}>{item.status}</p>
-                                <p style={{ fontWeight: "600" }}>{item.companyPreference}</p>
+                                <div style={{
+                                    fontSize: "2.2rem",
+                                    fontWeight: "900",
+                                    color: t.primary
+                                }}>
+                                    {item.totalScore}
+                                </div>
+
+                                <Link
+                                    to={`/result?id=${item._id}`}
+                                    style={{
+                                        background: "#000",
+                                        color: "#fff",
+                                        padding: "10px 18px",
+                                        borderRadius: "10px",
+                                        textDecoration: "none"
+                                    }}
+                                >
+                                    View →
+                                </Link>
                             </div>
-
-                            <div style={{
-                                fontSize: "2.2rem",
-                                fontWeight: "900",
-                                color: t.primary
-                            }}>
-                                {item.totalScore}
-                            </div>
-
-                            <Link to={`/result?id=${item._id}`} style={{
-                                background: "#000",
-                                color: "#fff",
-                                padding: "10px 18px",
-                                borderRadius: "10px",
-                                textDecoration: "none"
-                            }}>
-                                View →
-                            </Link>
-
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
+};
+
+const styles = {
+    shareItem: {
+        padding: "10px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        fontWeight: "500"
+    }
 };
 
 export default History;
