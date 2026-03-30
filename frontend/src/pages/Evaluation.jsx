@@ -7,6 +7,30 @@ import ProjectLogo from '../components/Logo';
 
 const API_BASE = "https://decision-backend-pl2m.onrender.com";
 const Evaluation = () => {
+
+     const [darkMode, setDarkMode] = useState(false);
+
+    const theme = {
+        light: {
+            bg: "#fcfcfd",
+            card: "#ffffff",
+            text: "#111827",
+            subText: "#6b7280",
+            border: "#e5e7eb",
+            primary: "#2563eb"
+        },
+        dark: {
+            bg: "#0f172a",
+            card: "#1e293b",
+            text: "#f1f5f9",
+            subText: "#94a3b8",
+            border: "#334155",
+            primary: "#3b82f6"
+        }
+    };
+
+    const currentTheme = darkMode ? theme.dark : theme.light;
+
     const [scores, setScores] = useState({
         technicalScore: 0,
         aptitudeScore: 0,
