@@ -65,7 +65,7 @@ const Dashboard = () => {
 
                 <div className="flex items-center gap-4">
 
-                    {/* THEME TOGGLE */}
+                    {/* THEME */}
                     <button
                         onClick={() => setDarkMode(!darkMode)}
                         className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition"
@@ -113,7 +113,7 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <>
-                        {/* SCORE + RETAKE */}
+                        {/* SCORE */}
                         <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8 hover:scale-[1.02] transition">
 
                             <div className="flex justify-between items-center">
@@ -132,7 +132,6 @@ const Dashboard = () => {
                                     </p>
                                 </div>
 
-                                {/* 🚀 RETAKE BUTTON */}
                                 <button
                                     onClick={() => navigate('/evaluation')}
                                     className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold hover:scale-105 transition"
@@ -141,14 +140,6 @@ const Dashboard = () => {
                                 </button>
 
                             </div>
-
-                        </div>
-
-                        {/* MOTIVATION */}
-                        <div className="p-6 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 mb-8">
-                            <p className="text-lg font-semibold">
-                                📈 You're improving consistently! Keep pushing forward 💪
-                            </p>
                         </div>
 
                         {/* PERFORMANCE */}
@@ -168,15 +159,17 @@ const Dashboard = () => {
                                     { label: 'Leadership', score: latestEval.leadershipScore, max: 15 },
                                 ].map((item, i) => {
 
-                                    const percentage = Math.round((item.score / item.max) * 100);
+                                    // ✅ FIXED LOGIC
+                                    const rawPercentage = Math.round((item.score / item.max) * 100);
+                                    const percentage = Math.min(rawPercentage, 100);
 
                                     let status = "";
                                     let color = "";
 
-                                    if (percentage >= 75) {
+                                    if (rawPercentage >= 75) {
                                         status = "Strong 💪";
                                         color = "text-green-400";
-                                    } else if (percentage >= 50) {
+                                    } else if (rawPercentage >= 50) {
                                         status = "Average 👍";
                                         color = "text-yellow-400";
                                     } else {
@@ -200,15 +193,16 @@ const Dashboard = () => {
                                                 {item.score} / {item.max}
                                             </p>
 
-                                            <div className="h-2 bg-white/10 rounded-full mb-2">
+                                            {/* ✅ FIXED BAR */}
+                                            <div className="h-2 bg-white/10 rounded-full mb-2 overflow-hidden">
                                                 <div
-                                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
                                                     style={{ width: `${percentage}%` }}
                                                 />
                                             </div>
 
                                             <p className="text-xs text-gray-400">
-                                                {percentage}% completed
+                                                {rawPercentage}% completed
                                             </p>
                                         </div>
                                     );
