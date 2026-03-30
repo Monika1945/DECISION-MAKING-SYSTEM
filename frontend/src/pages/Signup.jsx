@@ -18,11 +18,16 @@ const Signup = () => {
 
     const navigate = useNavigate();
 
-    // 🌗 Load saved theme
+    // ✅ Load saved theme
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
     }, []);
+
+    // ✅ Apply theme globally
+    useEffect(() => {
+        document.body.className = theme;
+    }, [theme]);
 
     // 🌗 Toggle Theme
     const toggleTheme = () => {
@@ -48,7 +53,7 @@ const Signup = () => {
             await axios.post(`${API_BASE}/api/auth/register`, formData);
 
             alert("Account created successfully! Please login.");
-            navigate('/login'); // ✅ correct flow
+            navigate('/login');
 
         } catch (err) {
             const errorMsg =
@@ -63,18 +68,14 @@ const Signup = () => {
     const isDark = theme === 'dark';
 
     return (
-        <div style={{
-            ...styles.pageWrapper,
-            background: isDark ? '#0f172a' : '#f9fafb',
-            color: isDark ? '#fff' : '#111'
-        }}>
+        <div style={styles.pageWrapper}>
 
             {/* 🌗 Toggle Button */}
             <button onClick={toggleTheme} style={styles.themeBtn}>
                 {isDark ? '☀️ Light' : '🌙 Dark'}
             </button>
 
-            {/* Background blobs */}
+            {/* Background */}
             <div style={styles.backgroundContainer}>
                 <div style={{
                     ...styles.blob,
@@ -82,6 +83,7 @@ const Signup = () => {
                     bottom: '10%',
                     left: '10%'
                 }}></div>
+
                 <div style={{
                     ...styles.blob,
                     backgroundColor: isDark ? '#9333ea' : '#93c5fd',
@@ -93,8 +95,8 @@ const Signup = () => {
             <div style={{
                 ...styles.card,
                 background: isDark
-                    ? 'rgba(30,41,59,0.8)'
-                    : 'rgba(255,255,255,0.7)',
+                    ? 'rgba(30,41,59,0.85)'
+                    : 'rgba(255,255,255,0.8)',
                 color: isDark ? '#fff' : '#111'
             }}>
 
@@ -107,8 +109,9 @@ const Signup = () => {
                             <label style={styles.label}>
                                 {field.charAt(0).toUpperCase() + field.slice(1)}
                             </label>
+
                             <input
-                                type={field === "password" ? "password" : "text"}
+                                type={field === "password" ? "password" : field === "email" ? "email" : "text"}
                                 name={field}
                                 onChange={handleChange}
                                 required={field !== "department" && field !== "year"}
@@ -116,7 +119,9 @@ const Signup = () => {
                                     ...styles.input,
                                     background: isDark ? '#1e293b' : '#fff',
                                     color: isDark ? '#fff' : '#111',
-                                    border: isDark ? '1px solid #334155' : '1px solid #ddd'
+                                    border: isDark
+                                        ? '1px solid #334155'
+                                        : '1px solid #ddd'
                                 }}
                             />
                         </div>
@@ -132,6 +137,7 @@ const Signup = () => {
                     >
                         {loading ? "Creating..." : "Sign Up"}
                     </button>
+
                 </form>
 
                 <p style={styles.footerText}>
@@ -166,7 +172,8 @@ const styles = {
         border: 'none',
         cursor: 'pointer',
         background: '#6366f1',
-        color: '#fff'
+        color: '#fff',
+        fontWeight: 'bold'
     },
 
     backgroundContainer: {
@@ -177,11 +184,11 @@ const styles = {
 
     blob: {
         position: 'absolute',
-        width: '20rem',
-        height: '20rem',
+        width: '22rem',
+        height: '22rem',
         borderRadius: '50%',
-        filter: 'blur(60px)',
-        opacity: 0.3,
+        filter: 'blur(70px)',
+        opacity: 0.35,
     },
 
     card: {
@@ -191,7 +198,7 @@ const styles = {
         width: '100%',
         maxWidth: '32rem',
         backdropFilter: 'blur(20px)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+        boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
     },
 
     header: {
@@ -218,14 +225,15 @@ const styles = {
     },
 
     input: {
-        padding: '0.7rem',
+        padding: '0.75rem',
         borderRadius: '8px',
-        outline: 'none'
+        outline: 'none',
+        transition: '0.2s'
     },
 
     button: {
         marginTop: '1rem',
-        padding: '0.8rem',
+        padding: '0.9rem',
         background: 'linear-gradient(to right, #2563eb, #9333ea)',
         color: '#fff',
         border: 'none',
