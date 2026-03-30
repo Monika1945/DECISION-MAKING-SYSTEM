@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
-const SidebarMenu = () => {
+const SidebarMenu = ({ color = "#1f2937" }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredLink, setHoveredLink] = useState(null);
     const [isMenuBtnHovered, setIsMenuBtnHovered] = useState(false);
 
     const navigate = useNavigate();
-    const location = useLocation(); // 🔥 active page detect
+    const location = useLocation();
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -17,10 +17,10 @@ const SidebarMenu = () => {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    // 🔥 UPDATED NAV ITEMS
+    // ✅ UPDATED NAV ITEMS (Home has icon)
     const navItems = [
         { path: '/dashboard', label: 'Dashboard 🏠' },
-        { path: '/', label: 'Home' },
+        { path: '/', label: 'Home', icon: '🏡' }, // ⭐ only here
         { path: '/profile', label: 'Profile 👤' },
         { path: '/history', label: 'History 📜' },
         { path: '/about', label: 'About ℹ️' },
@@ -36,21 +36,25 @@ const SidebarMenu = () => {
                 onMouseLeave={() => setIsMenuBtnHovered(false)}
                 style={{
                     ...styles.menuBtn,
+                    color: color,
                     ...(isMenuBtnHovered ? styles.menuBtnHover : {})
                 }}
             >
                 <div style={{
                     ...styles.hamburgerLine,
+                    backgroundColor: color,
                     ...(isOpen ? { transform: 'rotate(45deg) translateY(8px)' } : {})
                 }}></div>
 
                 <div style={{
                     ...styles.hamburgerLine,
+                    backgroundColor: color,
                     ...(isOpen ? { opacity: 0 } : {})
                 }}></div>
 
                 <div style={{
                     ...styles.hamburgerLine,
+                    backgroundColor: color,
                     ...(isOpen ? { transform: 'rotate(-45deg) translateY(-8px)' } : {})
                 }}></div>
             </button>
@@ -97,7 +101,13 @@ const SidebarMenu = () => {
                                                 ...(isActive ? styles.activeLink : {})
                                             }}
                                         >
-                                            {item.label}
+                                            {/* ✅ ICON + TEXT */}
+                                            <div style={styles.navItemContent}>
+                                                {item.icon && (
+                                                    <span style={styles.icon}>{item.icon}</span>
+                                                )}
+                                                {item.label}
+                                            </div>
                                         </Link>
                                     );
                                 })}
@@ -133,7 +143,6 @@ const styles = {
 
     menuBtn: {
         padding: '0.5rem',
-        color: '#1f2937',
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
@@ -147,7 +156,6 @@ const styles = {
     hamburgerLine: {
         width: '1.5rem',
         height: '4px',
-        backgroundColor: 'currentColor',
         borderRadius: '2px',
         transition: '0.3s'
     },
@@ -214,6 +222,16 @@ const styles = {
     activeLink: {
         background: '#7c3aed',
         color: 'white'
+    },
+
+    navItemContent: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px'
+    },
+
+    icon: {
+        fontSize: '1.1rem'
     },
 
     divider: {
