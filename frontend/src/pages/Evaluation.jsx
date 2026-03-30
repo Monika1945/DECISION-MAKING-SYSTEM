@@ -18,42 +18,48 @@ const Evaluation = () => {
     });
 
     const [technicalSkills, setTechnicalSkills] = useState([]);
-    const [newSkill, setNewSkill] = useState({ skill: '', rating: 0 });
-    const [darkMode, setDarkMode] = useState(true);
+    const [newTechSkill, setNewTechSkill] = useState({ skill: '', rating: 0 });
     const [loading, setLoading] = useState(false);
+    const [hoveredElement, setHoveredElement] = useState(null);
+    const [focusedInput, setFocusedInput] = useState(null);
 
     const navigate = useNavigate();
-    const theme = darkMode ? dark : light;
 
-    /* HANDLE CHANGE */
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setScores({ ...scores, [name]: Number(value) || value });
+        const { name, value, type } = e.target;
+        const val = type === 'number' ? Number(value) : value;
+        setScores({ ...scores, [name]: val });
     };
 
-    /* ADD SKILL */
-    const addSkill = () => {
-        if (!newSkill.skill || newSkill.rating === 0) return;
+    // ✅ TECH SCORE MAX = 10
+    const handleAddTechSkill = () => {
+        if (!newTechSkill.skill.trim()) return;
 
-        const updated = [...technicalSkills, newSkill];
-        setTechnicalSkills(updated);
+        const updatedSkills = [...technicalSkills, {
+            ...newTechSkill,
+            rating: Number(newTechSkill.rating)
+        }];
 
-        const total = updated.reduce((sum, s) => sum + s.rating, 0);
-        setScores({ ...scores, technicalScore: Math.min(total, 50) });
+        setTechnicalSkills(updatedSkills);
 
-        setNewSkill({ skill: '', rating: 0 });
+        const totalTech = updatedSkills.reduce((sum, s) => sum + s.rating, 0);
+
+        // 🔥 CHANGE HERE
+        setScores({ ...scores, technicalScore: Math.min(totalTech, 10) });
+
+        setNewTechSkill({ skill: '', rating: 0 });
     };
 
-    /* REMOVE SKILL */
-    const removeSkill = (index) => {
-        const updated = technicalSkills.filter((_, i) => i !== index);
-        setTechnicalSkills(updated);
+    const handleRemoveTechSkill = (index) => {
+        const updatedSkills = technicalSkills.filter((_, i) => i !== index);
+        setTechnicalSkills(updatedSkills);
 
-        const total = updated.reduce((sum, s) => sum + s.rating, 0);
-        setScores({ ...scores, technicalScore: Math.min(total, 50) });
+        const totalTech = updatedSkills.reduce((sum, s) => sum + s.rating, 0);
+
+        // 🔥 CHANGE HERE
+        setScores({ ...scores, technicalScore: Math.min(totalTech, 10) });
     };
 
-    /* SUBMIT */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -61,234 +67,150 @@ const Evaluation = () => {
         const token = localStorage.getItem('token');
 
         try {
-            await axios.post(`${API_BASE}/api/evaluation`, {
+            const dataToSubmit = {
                 ...scores,
                 technicalSkills
-            }, {
+            };
+
+            await axios.post(`${API_BASE}/api/evaluation`, dataToSubmit, {
                 headers: { 'x-auth-token': token }
             });
 
-            setTimeout(() => navigate('/result'), 1000);
+            setTimeout(() => {
+                setLoading(false);
+                navigate('/result');
+            }, 1200);
 
-        } catch {
-            alert("Submission failed ❌");
-        } finally {
+        } catch (err) {
             setLoading(false);
+            alert('Evaluation failed. Please try again.');
         }
     };
 
     return (
-        <div style={{ ...styles.page, background: theme.bg, color: theme.text }}>
+        <div style={styles.pageWrapper}>
+            <div style={styles.ambience}></div>
 
-            {/* NAVBAR */}
-            <nav style={{ ...styles.nav, borderBottom: theme.border }}>
-                <Link to="/dashboard"><ProjectLogo /></Link>
-
-                <div style={{ display: "flex", gap: "10px" }}>
-                    <button onClick={() => setDarkMode(!darkMode)} style={styles.toggle}>
-                        {darkMode ? "🌙" : "☀️"}
-                    </button>
-                    <SidebarMenu />
-                </div>
+            <nav style={styles.navbar}>
+                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                    <ProjectLogo style={styles.navLogo} />
+                </Link>
+                <SidebarMenu />
             </nav>
 
-            <div style={styles.container}>
-                <div style={{ ...styles.card, background: theme.card, border: theme.border }}>
+            <div style={styles.contentContainer}>
+                <div style={styles.header}>
+                    <h1 style={styles.title}>
+                        Placement <span style={styles.italicTitle}>Readiness</span> Assessment
+                    </h1>
+                </div>
 
-                    <h2 style={styles.title}>Placement Readiness 🚀</h2>
+                <form onSubmit={handleSubmit} style={styles.form}>
 
-                    <form onSubmit={handleSubmit}>
+                    {/* TECH SECTION */}
+                    <div style={styles.formSection}>
+                        <h2>Technical Skills</h2>
 
-                        {/* TECH SKILLS */}
-                        <h3>Technical Skills 💻</h3>
+                        <input
+                            type="text"
+                            placeholder="Skill"
+                            value={newTechSkill.skill}
+                            onChange={(e) =>
+                                setNewTechSkill({ ...newTechSkill, skill: e.target.value })
+                            }
+                        />
 
-                        <div style={styles.skillRow}>
-                            <input
-                                placeholder="Skill name"
-                                value={newSkill.skill}
-                                onChange={(e) => setNewSkill({ ...newSkill, skill: e.target.value })}
-                                style={{ ...styles.input, background: theme.inputBg, color: theme.text }}
-                            />
+                        <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={newTechSkill.rating}
+                            onChange={(e) =>
+                                setNewTechSkill({ ...newTechSkill, rating: e.target.value })
+                            }
+                        />
 
-                            <input
-                                type="number"
-                                placeholder="Rating (1-10)"
-                                value={newSkill.rating}
-                                onChange={(e) => setNewSkill({ ...newSkill, rating: Number(e.target.value) })}
-                                style={{ ...styles.input, width: "120px", background: theme.inputBg, color: theme.text }}
-                            />
+                        <button type="button" onClick={handleAddTechSkill}>
+                            Add Skill
+                        </button>
 
-                            <button type="button" onClick={addSkill} style={styles.addBtn}>
-                                Add +
-                            </button>
-                        </div>
-
-                        {/* SKILL LIST */}
                         {technicalSkills.map((s, i) => (
-                            <div key={i} style={styles.skillItem}>
-                                {s.skill} ({s.rating})
-                                <button onClick={() => removeSkill(i)} style={styles.removeBtn}>✕</button>
+                            <div key={i}>
+                                {s.skill} - {s.rating}
+                                <button onClick={() => handleRemoveTechSkill(i)}>X</button>
                             </div>
                         ))}
 
-                        {/* OTHER SCORES */}
-                        <div style={styles.grid}>
-                            {[
-                                { name: "aptitudeScore", max: 30 },
-                                { name: "communicationScore", max: 30 },
-                                { name: "logicalScore", max: 25 },
-                                { name: "leadershipScore", max: 15 }
-                            ].map((item) => (
-                                <input
-                                    key={item.name}
-                                    type="number"
-                                    name={item.name}
-                                    placeholder={item.name}
-                                    max={item.max}
-                                    value={scores[item.name]}
-                                    onChange={handleChange}
-                                    style={{ ...styles.input, background: theme.inputBg, color: theme.text }}
-                                />
-                            ))}
+                        <h3>
+                            Technical Score: {scores.technicalScore} / 10
+                        </h3>
+
+                        {/* ✅ PROGRESS BAR FIX */}
+                        <div style={{ background: "#eee", height: "10px" }}>
+                            <div
+                                style={{
+                                    height: "10px",
+                                    width: `${(scores.technicalScore / 10) * 100}%`,
+                                    background: "blue"
+                                }}
+                            />
                         </div>
+                    </div>
 
-                        {/* DROPDOWN */}
-                        <select
-                            name="companyPreference"
-                            value={scores.companyPreference}
-                            onChange={handleChange}
-                            style={{ ...styles.input, marginTop: "15px", background: theme.inputBg }}
-                        >
-                            <option>Product Based</option>
-                            <option>Service Based</option>
-                            <option>Startup</option>
-                        </select>
+                    {/* OTHER SCORES */}
+                    {[
+                        { name: 'aptitudeScore', label: 'Aptitude', max: 30 },
+                        { name: 'communicationScore', label: 'Communication', max: 20 },
+                        { name: 'logicalScore', label: 'Logical', max: 30 },
+                        { name: 'leadershipScore', label: 'Leadership', max: 20 }
+                    ].map(field => (
+                        <div key={field.name}>
+                            <label>{field.label}</label>
+                            <input
+                                type="number"
+                                name={field.name}
+                                max={field.max}
+                                value={scores[field.name]}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    ))}
 
-                        <input
-                            name="interestedSkill"
-                            placeholder="Interested Domain"
-                            value={scores.interestedSkill}
-                            onChange={handleChange}
-                            style={{ ...styles.input, marginTop: "10px", background: theme.inputBg }}
-                        />
+                    {/* PREFERENCES */}
+                    <select
+                        name="companyPreference"
+                        value={scores.companyPreference}
+                        onChange={handleChange}
+                    >
+                        <option value="Product Based">Product Based</option>
+                        <option value="Service Based">Service Based</option>
+                        <option value="Startup">Startup</option>
+                    </select>
 
-                        <button type="submit" style={styles.submitBtn}>
-                            {loading ? "Processing..." : "Submit 🚀"}
-                        </button>
+                    <input
+                        type="text"
+                        name="interestedSkill"
+                        placeholder="Interest"
+                        value={scores.interestedSkill}
+                        onChange={handleChange}
+                    />
 
-                    </form>
-                </div>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Submitting..." : "Submit"}
+                    </button>
+
+                </form>
             </div>
         </div>
     );
 };
 
-/* STYLES */
 const styles = {
-    page: { minHeight: "100vh" },
-
-    nav: {
-        padding: "15px 30px",
-        display: "flex",
-        justifyContent: "space-between"
-    },
-
-    toggle: {
-        padding: "6px 10px",
-        borderRadius: "8px",
-        border: "none",
-        cursor: "pointer"
-    },
-
-    container: {
-        maxWidth: "900px",
-        margin: "40px auto"
-    },
-
-    card: {
-        padding: "30px",
-        borderRadius: "20px",
-        backdropFilter: "blur(20px)",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.5)"
-    },
-
-    title: {
-        textAlign: "center",
-        marginBottom: "20px"
-    },
-
-    input: {
-        width: "100%",
-        padding: "12px",
-        borderRadius: "10px",
-        marginTop: "10px",
-        border: "1px solid #ccc"
-    },
-
-    grid: {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "10px",
-        marginTop: "20px"
-    },
-
-    skillRow: {
-        display: "flex",
-        gap: "10px",
-        marginBottom: "10px"
-    },
-
-    skillItem: {
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "10px",
-        background: "rgba(255,255,255,0.1)",
-        borderRadius: "10px",
-        marginTop: "5px"
-    },
-
-    addBtn: {
-        background: "#6366f1",
-        color: "white",
-        border: "none",
-        padding: "10px",
-        borderRadius: "8px"
-    },
-
-    removeBtn: {
-        background: "red",
-        color: "white",
-        border: "none",
-        borderRadius: "5px"
-    },
-
-    submitBtn: {
-        marginTop: "20px",
-        width: "100%",
-        padding: "15px",
-        borderRadius: "10px",
-        border: "none",
-        background: "linear-gradient(135deg,#6366f1,#ec4899)",
-        color: "white",
-        fontWeight: "bold"
-    }
-};
-
-/* THEMES */
-const light = {
-    bg: "#f8fafc",
-    text: "#111",
-    card: "rgba(255,255,255,0.9)",
-    border: "1px solid rgba(0,0,0,0.08)",
-    inputBg: "#fff"
-};
-
-const dark = {
-    bg: "#020617",
-    text: "#e5e7eb",
-    card: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    inputBg: "rgba(255,255,255,0.05)"
+    pageWrapper: { padding: 20 },
+    navbar: { display: 'flex', justifyContent: 'space-between' },
+    contentContainer: { maxWidth: 600, margin: 'auto' },
+    form: { display: 'flex', flexDirection: 'column', gap: 10 },
+    formSection: { border: '1px solid #ddd', padding: 20 }
 };
 
 export default Evaluation;
