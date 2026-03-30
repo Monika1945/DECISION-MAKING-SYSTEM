@@ -17,19 +17,19 @@ const SidebarMenu = ({ color = "#1f2937" }) => {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    // ✅ UPDATED NAV ITEMS (Home has icon)
+    // ✅ CLEAN NAV ITEMS (no emoji in label)
     const navItems = [
-        { path: '/dashboard', label: 'Dashboard 🏠' },
-        { path: '/', label: 'Home', icon: '🏡' }, // ⭐ only here
-        { path: '/profile', label: 'Profile 👤' },
-        { path: '/history', label: 'History 📜' },
-        { path: '/about', label: 'About ℹ️' },
+        { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+        { path: '/', label: 'Home', icon: '🏡' },
+        { path: '/profile', label: 'Profile', icon: '👤' },
+        { path: '/history', label: 'History', icon: '📜' },
+        { path: '/about', label: 'About', icon: 'ℹ️' },
     ];
 
     return (
         <div style={styles.container}>
 
-            {/* ☰ BUTTON */}
+            {/* ☰ MENU BUTTON */}
             <button
                 onClick={toggleMenu}
                 onMouseEnter={() => setIsMenuBtnHovered(true)}
@@ -43,20 +43,20 @@ const SidebarMenu = ({ color = "#1f2937" }) => {
                 <div style={{
                     ...styles.hamburgerLine,
                     backgroundColor: color,
-                    ...(isOpen ? { transform: 'rotate(45deg) translateY(8px)' } : {})
-                }}></div>
+                    ...(isOpen ? styles.line1Open : {})
+                }} />
 
                 <div style={{
                     ...styles.hamburgerLine,
                     backgroundColor: color,
                     ...(isOpen ? { opacity: 0 } : {})
-                }}></div>
+                }} />
 
                 <div style={{
                     ...styles.hamburgerLine,
                     backgroundColor: color,
-                    ...(isOpen ? { transform: 'rotate(-45deg) translateY(-8px)' } : {})
-                }}></div>
+                    ...(isOpen ? styles.line3Open : {})
+                }} />
             </button>
 
             {/* PORTAL */}
@@ -85,7 +85,6 @@ const SidebarMenu = ({ color = "#1f2937" }) => {
                             {/* NAV */}
                             <nav style={styles.nav}>
                                 {navItems.map((item) => {
-
                                     const isActive = location.pathname === item.path;
 
                                     return (
@@ -101,11 +100,8 @@ const SidebarMenu = ({ color = "#1f2937" }) => {
                                                 ...(isActive ? styles.activeLink : {})
                                             }}
                                         >
-                                            {/* ✅ ICON + TEXT */}
                                             <div style={styles.navItemContent}>
-                                                {item.icon && (
-                                                    <span style={styles.icon}>{item.icon}</span>
-                                                )}
+                                                <span style={styles.icon}>{item.icon}</span>
                                                 {item.label}
                                             </div>
                                         </Link>
@@ -137,7 +133,7 @@ const SidebarMenu = ({ color = "#1f2937" }) => {
     );
 };
 
-/* STYLES */
+/* 🎨 STYLES */
 const styles = {
     container: { position: 'relative' },
 
@@ -154,16 +150,24 @@ const styles = {
     menuBtnHover: { color: '#7c3aed' },
 
     hamburgerLine: {
-        width: '1.5rem',
-        height: '4px',
+        width: '1.6rem',
+        height: '3px',
         borderRadius: '2px',
         transition: '0.3s'
+    },
+
+    line1Open: {
+        transform: 'rotate(45deg) translateY(7px)'
+    },
+
+    line3Open: {
+        transform: 'rotate(-45deg) translateY(-7px)'
     },
 
     overlay: {
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.3)',
+        background: 'rgba(0,0,0,0.4)',
         backdropFilter: 'blur(6px)',
         zIndex: 999
     },
@@ -173,7 +177,7 @@ const styles = {
         top: 0,
         right: 0,
         height: '100vh',
-        width: '260px',
+        width: '270px',
         background: 'linear-gradient(135deg, #ffffff, #f3f4f6)',
         boxShadow: '-10px 0 30px rgba(0,0,0,0.15)',
         zIndex: 1000,
@@ -197,7 +201,7 @@ const styles = {
         border: 'none',
         background: 'transparent',
         cursor: 'pointer',
-        fontSize: '1.2rem'
+        fontSize: '1.3rem'
     },
 
     nav: {
@@ -207,11 +211,12 @@ const styles = {
     },
 
     navItem: {
-        padding: '10px 14px',
-        borderRadius: '10px',
+        padding: '12px 14px',
+        borderRadius: '12px',
         textDecoration: 'none',
         color: '#374151',
-        transition: '0.2s'
+        transition: '0.2s',
+        fontWeight: '600'
     },
 
     navItemHover: {
@@ -227,25 +232,26 @@ const styles = {
     navItemContent: {
         display: 'flex',
         alignItems: 'center',
-        gap: '10px'
+        gap: '12px'
     },
 
     icon: {
-        fontSize: '1.1rem'
+        fontSize: '1.2rem'
     },
 
     divider: {
         borderTop: '1px solid #e5e7eb',
-        margin: '10px 0'
+        margin: '12px 0'
     },
 
     logoutBtn: {
-        padding: '10px',
+        padding: '12px',
         border: 'none',
         background: 'transparent',
         color: '#ef4444',
         cursor: 'pointer',
-        borderRadius: '10px'
+        borderRadius: '12px',
+        fontWeight: '600'
     },
 
     logoutBtnHover: {
