@@ -1,63 +1,61 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Evaluation = () => {
-
-  const navigate = useNavigate();
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(180);
+  const [time, setTime] = useState(300);
 
-  // QUESTIONS
+  // ADVANCED QUESTIONS
   const questions = [
     {
       section: "Aptitude",
-      q: "A company produces 120 units/day. Efficiency drops by 25% for 4 days. Total production?",
-      options: ["360", "300", "400", "420"],
-      answer: "360"
+      q: "A manufacturing unit produces 200 units/day. Due to machine downtime, production reduces by 30% for 5 days. What is total production during these days?",
+      options: ["700", "750", "800", "900"],
+      answer: "700"
     },
     {
       section: "Logical",
-      q: "All engineers are coders. Some coders are designers. Which is true?",
+      q: "If all analysts are programmers and some programmers are managers, which conclusion is valid?",
       options: [
-        "All engineers are designers",
-        "Some engineers may be designers",
-        "No engineers are designers",
-        "All designers are engineers"
+        "All analysts are managers",
+        "Some analysts may be managers",
+        "No analyst is a manager",
+        "All managers are analysts"
       ],
-      answer: "Some engineers may be designers"
+      answer: "Some analysts may be managers"
     },
     {
       section: "Verbal",
-      q: "Choose correct meaning: 'She executed the task flawlessly.'",
+      q: "Choose correct interpretation: 'The system scaled efficiently under load.'",
       options: [
-        "With errors",
-        "Perfectly",
-        "Slowly",
-        "Carelessly"
+        "It failed under pressure",
+        "It handled increased demand well",
+        "It slowed down significantly",
+        "It stopped working"
       ],
-      answer: "Perfectly"
+      answer: "It handled increased demand well"
     }
   ];
 
   // TIMER
   useEffect(() => {
-    if (timeLeft > 0 && !submitted) {
-      const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    if (time > 0 && !submitted) {
+      const t = setTimeout(() => setTime(time - 1), 1000);
       return () => clearTimeout(t);
     }
-    if (timeLeft === 0) setSubmitted(true);
-  }, [timeLeft, submitted]);
+    if (time === 0) setSubmitted(true);
+  }, [time, submitted]);
 
-  // SELECT
   const select = (val) => {
     setAnswers({ ...answers, [step]: val });
   };
 
-  // RESULT LOGIC
-  const getResult = () => {
+  const submit = () => setSubmitted(true);
+
+  // RESULT ENGINE
+  const analyze = () => {
     let correct = 0;
     let section = { Aptitude: 0, Logical: 0, Verbal: 0 };
 
@@ -70,42 +68,40 @@ const Evaluation = () => {
 
     const percent = (correct / questions.length) * 100;
 
-    let status = percent >= 75 ? "READY 🚀" :
-                 percent >= 50 ? "ALMOST READY ⚠️" :
-                 "NOT READY ❌";
+    const feedback = [];
+    if (section.Aptitude < 1) feedback.push("📉 Improve quantitative problem solving");
+    if (section.Logical < 1) feedback.push("🧠 Strengthen logical reasoning");
+    if (section.Verbal < 1) feedback.push("🗣 Enhance communication clarity");
 
-    return { correct, percent, status, section };
+    return { correct, percent, section, feedback };
   };
 
-  // RESULT SCREEN
+  // RESULT UI
   if (submitted) {
-    const res = getResult();
+    const res = analyze();
 
     return (
-      <div className="min-h-screen bg-black text-white p-8">
+      <div className="min-h-screen bg-black text-white p-10">
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
 
-          <h1 className="text-4xl font-bold mb-6">🎯 Assessment Result</h1>
+          <h1 className="text-4xl font-bold mb-8">🚀 Performance Report</h1>
 
-          <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8">
+          {/* MAIN SCORE */}
+          <div className="p-10 rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 text-center mb-10">
 
-            <h2 className="text-5xl font-bold">{res.status}</h2>
-            <p className="mt-2 text-gray-400">
-              Score: {res.correct} / {questions.length} ({res.percent.toFixed(1)}%)
-            </p>
+            <h2 className="text-6xl font-bold">{res.percent.toFixed(0)}%</h2>
+            <p className="mt-2 text-lg">Hireability Score</p>
 
           </div>
 
-          {/* SECTION BREAKDOWN */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+          {/* SECTION CARDS */}
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
 
-            {Object.entries(res.section).map(([sec, val], i) => (
-              <div key={i} className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
-
+            {Object.entries(res.section).map(([sec, val]) => (
+              <div key={sec} className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
                 <h3 className="font-bold mb-2">{sec}</h3>
                 <p className="text-3xl">{val}</p>
-
               </div>
             ))}
 
@@ -114,20 +110,15 @@ const Evaluation = () => {
           {/* FEEDBACK */}
           <div className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
 
-            <h3 className="font-bold mb-3">Growth Insights 🧠</h3>
+            <h3 className="font-bold mb-3">AI Insights 🧠</h3>
 
-            {res.section.Aptitude === 0 && <p>👉 Improve Aptitude problem solving</p>}
-            {res.section.Logical === 0 && <p>👉 Practice logical reasoning</p>}
-            {res.section.Verbal === 0 && <p>👉 Work on communication skills</p>}
+            {res.feedback.length === 0 ? (
+              <p>🔥 Excellent! You are placement ready.</p>
+            ) : (
+              res.feedback.map((f, i) => <p key={i}>👉 {f}</p>)
+            )}
 
           </div>
-
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"
-          >
-            Back to Dashboard
-          </button>
 
         </div>
       </div>
@@ -140,9 +131,9 @@ const Evaluation = () => {
     <div className="min-h-screen bg-black text-white">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center px-8 py-4 border-b border-white/10 backdrop-blur-xl">
-        <h2 className="text-xl font-bold">Assessment</h2>
-        <span className="text-purple-400">⏱ {timeLeft}s</span>
+      <div className="flex justify-between px-8 py-4 border-b border-white/10 backdrop-blur-xl">
+        <h2 className="font-bold">Assessment Engine</h2>
+        <span className="text-purple-400">⏱ {time}s</span>
       </div>
 
       <div className="max-w-4xl mx-auto p-6">
@@ -150,27 +141,26 @@ const Evaluation = () => {
         {/* PROGRESS */}
         <div className="h-2 bg-white/10 rounded-full mb-6">
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+            className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
             style={{ width: `${((step + 1) / questions.length) * 100}%` }}
           />
         </div>
 
-        {/* QUESTION CARD */}
-        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl">
+        {/* CARD */}
+        <div className="p-8 bg-white/10 rounded-3xl backdrop-blur-xl">
 
-          <p className="text-sm text-gray-400 mb-2">{q.section}</p>
+          <p className="text-sm text-gray-400">{q.section}</p>
+          <h3 className="text-xl font-semibold mt-2">{q.q}</h3>
 
-          <h3 className="text-xl font-semibold mb-4">{q.q}</h3>
-
-          <div className="space-y-3">
+          <div className="mt-5 space-y-3">
             {q.options.map(opt => (
               <button
                 key={opt}
                 onClick={() => select(opt)}
-                className={`w-full text-left px-4 py-3 rounded-xl transition 
-                ${answers[step] === opt 
-                  ? "bg-purple-600 text-white" 
-                  : "bg-white/10 hover:bg-white/20"}`}
+                className={`w-full px-4 py-3 rounded-xl text-left transition
+                  ${answers[step] === opt 
+                    ? "bg-purple-600" 
+                    : "bg-white/10 hover:bg-white/20"}`}
               >
                 {opt}
               </button>
@@ -190,7 +180,7 @@ const Evaluation = () => {
 
             {step === questions.length - 1 ? (
               <button
-                onClick={() => setSubmitted(true)}
+                onClick={submit}
                 className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl"
               >
                 Submit 🚀
@@ -208,14 +198,14 @@ const Evaluation = () => {
 
         </div>
 
-        {/* NAVIGATOR */}
+        {/* QUESTION PALETTE */}
         <div className="flex gap-2 mt-6 flex-wrap">
           {questions.map((_, i) => (
             <button
               key={i}
               onClick={() => setStep(i)}
               className={`w-10 h-10 rounded-full 
-              ${answers[i] ? "bg-green-500" : "bg-white/10"}`}
+                ${answers[i] ? "bg-green-500" : "bg-white/10"}`}
             >
               {i + 1}
             </button>
