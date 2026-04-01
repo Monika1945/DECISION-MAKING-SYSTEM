@@ -15,7 +15,9 @@ const Evaluation = () => {
   const [interest, setInterest] = useState("");
   const [company, setCompany] = useState("");
 
-  // 🌙 Load Theme
+  const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
+
+  // 🌙 Theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -24,7 +26,6 @@ const Evaluation = () => {
     }
   }, []);
 
-  // 🌗 Toggle Theme
   const toggleTheme = () => {
     const root = document.documentElement;
     root.classList.toggle("dark");
@@ -34,53 +35,37 @@ const Evaluation = () => {
   };
 
   const theme = {
-    light: {
-      bg: "#f1f5f9",
-      card: "#ffffff",
-      text: "#0f172a",
-      sub: "#64748b",
-      border: "#e2e8f0",
-      primary: "#4f46e5"
-    },
-    dark: {
-      bg: "#020617",
-      card: "#1e293b",
-      text: "#f1f5f9",
-      sub: "#94a3b8",
-      border: "#334155",
-      primary: "#6366f1"
-    }
+    light: { bg: "#f1f5f9", card: "#fff", text: "#0f172a", primary: "#4f46e5" },
+    dark: { bg: "#020617", card: "#1e293b", text: "#f1f5f9", primary: "#6366f1" }
   };
 
   const t = darkMode ? theme.dark : theme.light;
 
-  const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
-
-  // 🧠 Question Bank (Scenario-based improved)
+  // 🧠 QUESTIONS (SCENARIO BASED)
   const questionBank = {
     Aptitude: [
       {
-        q: "A company reduces its daily production of 500 units by 20% due to maintenance. What is the new production?",
+        q: "A company reduces 500 units by 20%. New production?",
         options: ["400", "420", "450", "380"],
         ans: "400"
       },
       {
-        q: "A delivery van travels 60 km/hr for 3 hours. How far does it go?",
-        options: ["180", "150", "200", "120"],
+        q: "Delivery travels 60km/hr for 3 hrs. Distance?",
+        options: ["180", "150", "120", "200"],
         ans: "180"
       },
       {
-        q: "You invest ₹800 and earn ₹200 profit. What is your profit percentage?",
+        q: "Profit ₹200 on ₹800. Profit %?",
         options: ["25%", "20%", "30%", "40%"],
         ans: "25%"
       },
       {
-        q: "A loan of ₹1000 at 10% simple interest for 2 years gives how much interest?",
+        q: "SI on ₹1000 @10% for 2 yrs?",
         options: ["200", "100", "300", "400"],
         ans: "200"
       },
       {
-        q: "If x = 2, what is x² + 2x?",
+        q: "If x=2, x²+2x?",
         options: ["8", "6", "10", "12"],
         ans: "8"
       }
@@ -88,86 +73,34 @@ const Evaluation = () => {
 
     Logical: [
       {
-        q: "All developers are testers. Some testers are managers. Which is correct?",
-        options: ["Some developers may be managers", "All developers are managers", "None", "All testers are developers"],
-        ans: "Some developers may be managers"
+        q: "All devs are testers. Some testers managers?",
+        options: ["Some devs may be managers", "All devs managers", "None", "All testers devs"],
+        ans: "Some devs may be managers"
       },
-      {
-        q: "Find next number: 2, 4, 8, 16, ?",
-        options: ["32", "24", "20", "18"],
-        ans: "32"
-      },
-      {
-        q: "Odd one out: Apple, Mango, Carrot",
-        options: ["Carrot", "Apple", "Mango", "None"],
-        ans: "Carrot"
-      },
-      {
-        q: "Mirror image of LEFT?",
-        options: ["TFEL", "LEFT", "FLET", "None"],
-        ans: "TFEL"
-      },
-      {
-        q: "If A > B and B > C, then?",
-        options: ["A > C", "C > A", "A = B", "None"],
-        ans: "A > C"
-      }
+      { q: "2,4,8,16,?", options: ["32", "24", "20", "18"], ans: "32" },
+      { q: "Odd one: Apple, Mango, Carrot", options: ["Carrot", "Apple", "Mango", "None"], ans: "Carrot" },
+      { q: "Mirror LEFT?", options: ["TFEL", "LEFT", "FLET", "None"], ans: "TFEL" },
+      { q: "A>B, B>C?", options: ["A>C", "C>A", "A=B", "None"], ans: "A>C" }
     ],
 
     Verbal: [
       {
-        q: "The project was executed seamlessly. What does 'seamlessly' mean?",
-        options: ["Without problems", "Slowly", "Poorly", "Incomplete"],
+        q: "Seamlessly means?",
+        options: ["Without problems", "Slow", "Bad", "Incomplete"],
         ans: "Without problems"
       },
-      {
-        q: "Opposite of 'Strong'?",
-        options: ["Weak", "Hard", "Solid", "Big"],
-        ans: "Weak"
-      },
-      {
-        q: "Choose correct: She ___ going to office.",
-        options: ["is", "are", "am", "be"],
-        ans: "is"
-      },
-      {
-        q: "Meaning of Rapid?",
-        options: ["Fast", "Slow", "Late", "Stop"],
-        ans: "Fast"
-      },
-      {
-        q: "Execute means?",
-        options: ["Perform", "Stop", "Cancel", "Break"],
-        ans: "Perform"
-      }
+      { q: "Opposite of Strong?", options: ["Weak", "Hard", "Big", "Solid"], ans: "Weak" },
+      { q: "She ___ going.", options: ["is", "are", "am", "be"], ans: "is" },
+      { q: "Rapid means?", options: ["Fast", "Slow", "Late", "Stop"], ans: "Fast" },
+      { q: "Execute?", options: ["Perform", "Stop", "Cancel", "Break"], ans: "Perform" }
     ],
 
     Technical: [
-      {
-        q: "You are writing a system program. Which language is most suitable?",
-        options: ["C", "HTML", "CSS", "SQL"],
-        ans: "C"
-      },
-      {
-        q: "Which concept does Java follow?",
-        options: ["OOP", "Procedural", "Markup", "Functional"],
-        ans: "OOP"
-      },
-      {
-        q: "Operating system manages?",
-        options: ["Hardware", "Memory", "Processes", "All"],
-        ans: "All"
-      },
-      {
-        q: "TCP belongs to which layer?",
-        options: ["Transport", "Network", "Physical", "Data Link"],
-        ans: "Transport"
-      },
-      {
-        q: "RAM is?",
-        options: ["Temporary memory", "Permanent memory", "External", "None"],
-        ans: "Temporary memory"
-      }
+      { q: "System programming language?", options: ["C", "HTML", "CSS", "SQL"], ans: "C" },
+      { q: "Java is?", options: ["OOP", "Procedural", "Markup", "Functional"], ans: "OOP" },
+      { q: "OS manages?", options: ["Hardware", "Memory", "Process", "All"], ans: "All" },
+      { q: "TCP layer?", options: ["Transport", "Network", "DL", "Physical"], ans: "Transport" },
+      { q: "RAM?", options: ["Temporary", "Permanent", "External", "None"], ans: "Temporary" }
     ]
   };
 
@@ -190,23 +123,15 @@ const Evaluation = () => {
 
   const finalSubmit = () => {
     const total = Object.values(scores).reduce((a, b) => a + b, 0);
-    const percent = (total / (sections.length * 5)) * 100;
-
-    let status =
-      percent >= 75 ? "READY ✅" :
-      percent >= 50 ? "ALMOST READY ⚠️" :
-      "NOT READY ❌";
+    const percent = (total / 20) * 100;
 
     navigate("/result", {
       state: {
-        totalScore: total,
-        aptitudeScore: scores.Aptitude || 0,
-        logicalScore: scores.Logical || 0,
-        communicationScore: scores.Verbal || 0,
-        technicalScore: scores.Technical || 0,
-        status,
+        scores,
+        total,
+        percent,
         interest,
-        companyPreference: company
+        company
       }
     });
   };
@@ -219,18 +144,13 @@ const Evaluation = () => {
         <ProjectLogo />
         <div style={{ display: "flex", gap: "10px" }}>
           <button onClick={toggleTheme}>
-            {darkMode ? "🌞 Light" : "🌙 Dark"}
+            {darkMode ? "🌞" : "🌙"}
           </button>
           <SidebarMenu color={t.text} />
         </div>
       </nav>
 
-      <div style={{
-        maxWidth: "900px",
-        width: "100%",
-        margin: "auto",
-        padding: "2rem"
-      }}>
+      <div style={{ maxWidth: "900px", margin: "auto", padding: "2rem" }}>
 
         {/* QUESTIONS */}
         {activeSection && (
@@ -238,16 +158,8 @@ const Evaluation = () => {
             <h2>{activeSection} Test</h2>
 
             {questions.map((q, i) => (
-              <div key={i} style={{
-                margin: "1rem 0",
-                padding: "1rem",
-                background: t.card,
-                borderRadius: "10px"
-              }}>
-                <p style={{
-                  lineHeight: "1.5",
-                  wordBreak: "break-word"
-                }}>{q.q}</p>
+              <div key={i} style={{ margin: "1rem 0", padding: "1rem", background: t.card }}>
+                <p>{q.q}</p>
 
                 {q.options.map(opt => (
                   <button
@@ -255,17 +167,11 @@ const Evaluation = () => {
                     onClick={() => setAnswers({ ...answers, [i]: opt })}
                     style={{
                       display: "block",
-                      width: "100%",
-                      textAlign: "left",
-                      margin: "6px 0",
-                      padding: "10px",
-                      borderRadius: "8px",
-                      border: "none",
-                      background:
-                        answers[i] === opt
-                          ? t.primary
-                          : (darkMode ? "#334155" : "#e2e8f0"),
-                      color: answers[i] === opt ? "#fff" : t.text
+                      margin: "5px 0",
+                      background: answers[i] === opt ? t.primary : "#ddd",
+                      color: answers[i] === opt ? "#fff" : "#000",
+                      padding: "8px",
+                      border: "none"
                     }}
                   >
                     {opt}
@@ -274,106 +180,56 @@ const Evaluation = () => {
               </div>
             ))}
 
-            <button
-              onClick={submitSection}
-              style={{
-                background: "green",
-                color: "#fff",
-                padding: "12px",
-                border: "none",
-                borderRadius: "10px",
-                width: "100%"
-              }}
-            >
+            <button onClick={submitSection} style={{ background: "green", color: "#fff", padding: "10px" }}>
               Submit Section ✅
             </button>
           </>
         )}
 
-        {/* MAIN UI */}
+        {/* MAIN */}
         {!activeSection && (
           <>
             <h1>Assessment</h1>
 
             {sections.map(sec => (
-              <div key={sec} style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "15px",
-                margin: "10px 0",
-                background: t.card,
-                borderRadius: "10px"
-              }}>
+              <div key={sec} style={{ display: "flex", justifyContent: "space-between", padding: "15px", background: t.card, margin: "10px 0" }}>
                 <h3>{sec}</h3>
-
                 <button
                   onClick={() => startTest(sec)}
                   style={{
                     background: completed[sec] ? "green" : "red",
                     color: "#fff",
-                    padding: "8px 14px",
-                    border: "none",
-                    borderRadius: "8px"
+                    padding: "8px"
                   }}
                 >
-                  {completed[sec] ? "Completed ✅" : "Take Test"}
+                  {completed[sec] ? "Completed" : "Take Test"}
                 </button>
               </div>
             ))}
 
-            {/* INTEREST */}
             <input
-              placeholder="Enter your interest (ML, Web Dev...)"
+              placeholder="Enter your interest"
               value={interest}
               onChange={(e) => setInterest(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "20px",
-                borderRadius: "8px",
-                border: `1px solid ${t.border}`,
-                background: t.card,
-                color: t.text
-              }}
+              style={{ width: "100%", padding: "10px", marginTop: "10px" }}
             />
 
-            {/* COMPANY */}
             <select
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "10px",
-                borderRadius: "8px",
-                border: `1px solid ${t.border}`,
-                background: t.card,
-                color: t.text
-              }}
+              style={{ width: "100%", padding: "10px", marginTop: "10px" }}
             >
-              <option value="">Select Company Type</option>
+              <option value="">Select Company</option>
               <option>Product</option>
               <option>Service</option>
               <option>Startup</option>
             </select>
 
-            <button
-              onClick={finalSubmit}
-              style={{
-                marginTop: "20px",
-                width: "100%",
-                background: t.primary,
-                color: "#fff",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "none"
-              }}
-            >
+            <button onClick={finalSubmit} style={{ marginTop: "20px", width: "100%", background: t.primary, color: "#fff", padding: "12px" }}>
               Final Submit →
             </button>
           </>
         )}
-
       </div>
     </div>
   );
