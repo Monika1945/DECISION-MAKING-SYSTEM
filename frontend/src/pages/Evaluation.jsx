@@ -1,253 +1,223 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
-const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
 const Evaluation = () => {
 
-  const navigate = useNavigate();
-
-  // SKILLS
-  const [skills, setSkills] = useState([]);
-  const [skill, setSkill] = useState("");
-  const [level, setLevel] = useState("Basic");
-
-  // QUIZ ANSWERS
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
 
-  // LOADING
-  const [loading, setLoading] = useState(false);
-
-  // QUESTIONS
-  const aptitude = [
-    { q: "2 + 2 = ?", options: ["3", "4", "5"], answer: "4" },
-    { q: "10 / 2 = ?", options: ["2", "5", "10"], answer: "5" }
+  // SCENARIO BASED QUESTIONS
+  const questions = [
+    {
+      section: "Aptitude",
+      q: "A company produces 120 units per day. Due to maintenance, production decreases by 20% for 3 days. What is total production for these 3 days?",
+      options: ["288", "300", "320", "360"],
+      answer: "288"
+    },
+    {
+      section: "Logical",
+      q: "All developers are testers. Some testers are managers. Which statement is true?",
+      options: [
+        "All developers are managers",
+        "Some developers may be managers",
+        "No developer is a manager",
+        "All managers are developers"
+      ],
+      answer: "Some developers may be managers"
+    },
+    {
+      section: "Verbal",
+      q: "Choose the correct meaning: 'The project was executed seamlessly.'",
+      options: [
+        "With difficulty",
+        "Without problems",
+        "Very slowly",
+        "Incomplete"
+      ],
+      answer: "Without problems"
+    }
   ];
 
-  const logical = [
-    { q: "2,4,6, ?", options: ["7", "8", "9"], answer: "8" }
-  ];
-
-  const verbal = [
-    { q: "Synonym of FAST?", options: ["Quick", "Slow", "Late"], answer: "Quick" }
-  ];
-
-  // ADD SKILL
-  const addSkill = () => {
-    if (!skill.trim()) return;
-    setSkills([...skills, { skill, level }]);
-    setSkill("");
+  // HANDLE ANSWER
+  const selectOption = (value) => {
+    setAnswers({ ...answers, [step]: value });
   };
 
-  // HANDLE ANSWERS
-  const handleAnswer = (section, index, value) => {
-    setAnswers({
-      ...answers,
-      [`${section}-${index}`]: value
-    });
+  // NEXT QUESTION
+  const next = () => {
+    if (step < questions.length - 1) setStep(step + 1);
   };
 
-  // SKILL SCORE
-  const calcSkillScore = () => {
-    let score = 0;
-    skills.forEach(s => {
-      if (s.level === "Basic") score += 2;
-      if (s.level === "Moderate") score += 4;
-      if (s.level === "Advanced") score += 6;
-    });
-    return Math.min(score, 40);
-  };
-
-  // QUIZ SCORE
-  const calcQuizScore = () => {
-    let score = 0;
-    let total = 0;
-
-    const check = (arr, sec) => {
-      arr.forEach((q, i) => {
-        total++;
-        if (answers[`${sec}-${i}`] === q.answer) score++;
-      });
-    };
-
-    check(aptitude, "aptitude");
-    check(logical, "logical");
-    check(verbal, "verbal");
-
-    return (score / total) * 60 || 0;
-  };
-
-  // FINAL RESULT
-  const getFinalResult = () => {
-    const totalScore = calcSkillScore() + calcQuizScore();
-
-    if (totalScore >= 75) return "READY";
-    if (totalScore >= 50) return "ALMOST READY";
-    return "NOT READY";
+  // PREV QUESTION
+  const prev = () => {
+    if (step > 0) setStep(step - 1);
   };
 
   // SUBMIT
-  const handleSubmit = async () => {
-
-    setLoading(true);
-
-    const payload = {
-      skills,
-      answers,
-      skillScore: calcSkillScore(),
-      quizScore: calcQuizScore(),
-      totalScore: calcSkillScore() + calcQuizScore(),
-      result: getFinalResult()
-    };
-
-    try {
-      const token = localStorage.getItem("token");
-
-      await axios.post(`${API_BASE}/api/evaluation`, payload, {
-        headers: { "x-auth-token": token }
-      });
-
-      navigate("/result", { state: payload });
-
-    } catch (err) {
-      alert("Submission failed");
-    }
-
-    setLoading(false);
+  const handleSubmit = () => {
+    setSubmitted(true);
   };
+
+  // CALCULATE RESULT
+  const getResult = () => {
+    let score = 0;
+
+    questions.forEach((q, i) => {
+      if (answers[i] === q.answer) score++;
+    });
+
+    const percent = (score / questions.length) * 100;
+
+    let status = "";
+    if (percent >= 75) status = "READY ✅";
+    else if (percent >= 50) status = "ALMOST READY ⚠️";
+    else status = "NOT READY ❌";
+
+    return { score, percent, status };
+  };
+
+  // RESULT SCREEN
+  if (submitted) {
+    const res = getResult();
+
+    return (
+      <div style={styles.page}>
+        <div style={styles.resultCard}>
+          <h1>🎯 Evaluation Result</h1>
+
+          <h2>{res.status}</h2>
+          <p>Score: {res.score} / {questions.length}</p>
+          <p>Percentage: {res.percent.toFixed(1)}%</p>
+
+          <button onClick={() => window.location.reload()} style={styles.btn}>
+            Retake Test
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const current = questions[step];
 
   return (
     <div style={styles.page}>
 
-      <h1 style={styles.title}>Placement Readiness</h1>
-
-      {/* SKILLS */}
       <div style={styles.card}>
-        <h2>💻 Technical Skills</h2>
 
-        <div style={styles.row}>
-          <input
-            placeholder="Enter skill"
-            value={skill}
-            onChange={(e) => setSkill(e.target.value)}
-            style={styles.input}
-          />
+        <h3>{current.section} Assessment</h3>
 
-          <select value={level} onChange={(e) => setLevel(e.target.value)} style={styles.select}>
-            <option>Basic</option>
-            <option>Moderate</option>
-            <option>Advanced</option>
-          </select>
-
-          <button onClick={addSkill} style={styles.addBtn}>Add</button>
+        <div style={styles.progress}>
+          Question {step + 1} / {questions.length}
         </div>
 
-        <div style={styles.skillList}>
-          {skills.map((s, i) => (
-            <div key={i} style={styles.skillChip}>
-              {s.skill} • {s.level}
-            </div>
+        <p style={styles.question}>{current.q}</p>
+
+        <div style={styles.options}>
+          {current.options.map(opt => (
+            <button
+              key={opt}
+              onClick={() => selectOption(opt)}
+              style={{
+                ...styles.optionBtn,
+                background: answers[step] === opt ? "#2563eb" : "#f1f5f9",
+                color: answers[step] === opt ? "#fff" : "#111"
+              }}
+            >
+              {opt}
+            </button>
           ))}
         </div>
-      </div>
 
-      {/* QUIZ */}
-      {[["aptitude", aptitude], ["logical", logical], ["verbal", verbal]].map(([sec, qs]) => (
-        <div key={sec} style={styles.card}>
-          <h2>{sec.toUpperCase()}</h2>
+        <div style={styles.nav}>
+          <button onClick={prev} disabled={step === 0}>Prev</button>
 
-          {qs.map((q, i) => (
-            <div key={i}>
-              <p>{q.q}</p>
-              {q.options.map(opt => (
-                <button
-                  key={opt}
-                  onClick={() => handleAnswer(sec, i, opt)}
-                  style={{
-                    ...styles.optBtn,
-                    background: answers[`${sec}-${i}`] === opt ? "#2563eb" : "#eee",
-                    color: answers[`${sec}-${i}`] === opt ? "#fff" : "#000"
-                  }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          ))}
+          {step === questions.length - 1 ? (
+            <button onClick={handleSubmit} style={styles.submit}>
+              Submit Test
+            </button>
+          ) : (
+            <button onClick={next}>Next</button>
+          )}
         </div>
-      ))}
 
-      {/* RESULT */}
-      <div style={styles.result}>
-        <p>Skill Score: {calcSkillScore()} / 40</p>
-        <p>Quiz Score: {calcQuizScore().toFixed(2)} / 60</p>
-        <h2>{getFinalResult()}</h2>
       </div>
-
-      <button onClick={handleSubmit} style={styles.submit}>
-        {loading ? "Submitting..." : "Submit Evaluation"}
-      </button>
 
     </div>
   );
 };
 
 const styles = {
-  page: { padding: "2rem", fontFamily: "Inter" },
-  title: { fontSize: "2rem", fontWeight: "900" },
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f8fafc",
+    fontFamily: "Inter"
+  },
 
   card: {
     background: "#fff",
-    padding: "1.5rem",
+    padding: "2rem",
+    borderRadius: "1.5rem",
+    width: "500px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+  },
+
+  question: {
     marginTop: "1rem",
-    borderRadius: "1rem",
-    boxShadow: "0 5px 20px rgba(0,0,0,0.05)"
+    fontSize: "1.1rem",
+    fontWeight: "600"
   },
 
-  row: { display: "flex", gap: "1rem" },
+  options: {
+    marginTop: "1rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem"
+  },
 
-  input: { padding: "0.5rem", borderRadius: "0.5rem" },
-  select: { padding: "0.5rem" },
+  optionBtn: {
+    padding: "0.75rem",
+    borderRadius: "0.5rem",
+    border: "none",
+    cursor: "pointer"
+  },
 
-  addBtn: {
-    background: "#111",
+  nav: {
+    marginTop: "1.5rem",
+    display: "flex",
+    justifyContent: "space-between"
+  },
+
+  submit: {
+    background: "#16a34a",
     color: "#fff",
-    padding: "0.5rem 1rem",
-    border: "none"
-  },
-
-  skillList: { marginTop: "1rem", display: "flex", gap: "0.5rem" },
-
-  skillChip: {
-    background: "#eef2ff",
-    padding: "0.5rem 1rem",
-    borderRadius: "999px"
-  },
-
-  optBtn: {
-    margin: "0.3rem",
     padding: "0.5rem 1rem",
     border: "none",
     borderRadius: "0.5rem"
   },
 
-  result: {
-    marginTop: "2rem",
-    padding: "1rem",
+  resultCard: {
     background: "#111",
     color: "#fff",
-    borderRadius: "1rem"
+    padding: "3rem",
+    borderRadius: "2rem",
+    textAlign: "center"
   },
 
-  submit: {
+  btn: {
     marginTop: "1rem",
-    padding: "1rem",
-    width: "100%",
-    background: "#2563eb",
-    color: "#fff",
+    padding: "0.75rem 1.5rem",
     border: "none",
-    borderRadius: "1rem"
+    borderRadius: "1rem",
+    background: "#2563eb",
+    color: "#fff"
+  },
+
+  progress: {
+    fontSize: "0.8rem",
+    color: "#6b7280"
   }
 };
 
