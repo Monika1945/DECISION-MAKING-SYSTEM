@@ -1,40 +1,43 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
 const Evaluation = () => {
 
-  // TECH SKILLS
+  const navigate = useNavigate();
+
+  // SKILLS
   const [skills, setSkills] = useState([]);
-  const [skillInput, setSkillInput] = useState("");
+  const [skill, setSkill] = useState("");
   const [level, setLevel] = useState("Basic");
 
-  // QUIZ STATES
+  // QUIZ ANSWERS
   const [answers, setAnswers] = useState({});
 
-  // CAREER
-  const [career, setCareer] = useState({
-    companyPreference: "Product Based",
-    interestedSkill: ""
-  });
+  // LOADING
+  const [loading, setLoading] = useState(false);
 
   // QUESTIONS
-  const aptitudeQ = [
+  const aptitude = [
     { q: "2 + 2 = ?", options: ["3", "4", "5"], answer: "4" },
-    { q: "5 * 3 = ?", options: ["10", "15", "20"], answer: "15" },
+    { q: "10 / 2 = ?", options: ["2", "5", "10"], answer: "5" }
   ];
 
-  const logicalQ = [
-    { q: "Next: 2,4,6, ?", options: ["7", "8", "9"], answer: "8" },
+  const logical = [
+    { q: "2,4,6, ?", options: ["7", "8", "9"], answer: "8" }
   ];
 
-  const verbalQ = [
-    { q: "Synonym of FAST?", options: ["Quick", "Slow", "Late"], answer: "Quick" },
+  const verbal = [
+    { q: "Synonym of FAST?", options: ["Quick", "Slow", "Late"], answer: "Quick" }
   ];
 
   // ADD SKILL
   const addSkill = () => {
-    if (!skillInput) return;
-    setSkills([...skills, { skill: skillInput, level }]);
-    setSkillInput("");
+    if (!skill.trim()) return;
+    setSkills([...skills, { skill, level }]);
+    setSkill("");
   };
 
   // HANDLE ANSWERS
@@ -45,75 +48,127 @@ const Evaluation = () => {
     });
   };
 
-  // CALCULATE SCORE
-  const calculateScore = () => {
+  // SKILL SCORE
+  const calcSkillScore = () => {
+    let score = 0;
+    skills.forEach(s => {
+      if (s.level === "Basic") score += 2;
+      if (s.level === "Moderate") score += 4;
+      if (s.level === "Advanced") score += 6;
+    });
+    return Math.min(score, 40);
+  };
+
+  // QUIZ SCORE
+  const calcQuizScore = () => {
     let score = 0;
     let total = 0;
 
-    const check = (questions, section) => {
-      questions.forEach((q, i) => {
+    const check = (arr, sec) => {
+      arr.forEach((q, i) => {
         total++;
-        if (answers[`${section}-${i}`] === q.answer) score++;
+        if (answers[`${sec}-${i}`] === q.answer) score++;
       });
     };
 
-    check(aptitudeQ, "aptitude");
-    check(logicalQ, "logical");
-    check(verbalQ, "verbal");
+    check(aptitude, "aptitude");
+    check(logical, "logical");
+    check(verbal, "verbal");
 
-    return { score, total };
+    return (score / total) * 60 || 0;
   };
 
   // FINAL RESULT
-  const getResult = () => {
-    const { score, total } = calculateScore();
-    const percent = (score / total) * 100;
+  const getFinalResult = () => {
+    const totalScore = calcSkillScore() + calcQuizScore();
 
-    if (percent >= 75) return "READY ✅";
-    if (percent >= 50) return "ALMOST READY ⚠️";
-    return "NOT READY ❌";
+    if (totalScore >= 75) return "READY";
+    if (totalScore >= 50) return "ALMOST READY";
+    return "NOT READY";
+  };
+
+  // SUBMIT
+  const handleSubmit = async () => {
+
+    setLoading(true);
+
+    const payload = {
+      skills,
+      answers,
+      skillScore: calcSkillScore(),
+      quizScore: calcQuizScore(),
+      totalScore: calcSkillScore() + calcQuizScore(),
+      result: getFinalResult()
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.post(`${API_BASE}/api/evaluation`, payload, {
+        headers: { "x-auth-token": token }
+      });
+
+      navigate("/result", { state: payload });
+
+    } catch (err) {
+      alert("Submission failed");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={styles.page}>
 
-      <h1>Placement Readiness Evaluation</h1>
+      <h1 style={styles.title}>Placement Readiness</h1>
 
-      {/* TECH SKILLS */}
-      <h2>Technical Skills</h2>
+      {/* SKILLS */}
+      <div style={styles.card}>
+        <h2>💻 Technical Skills</h2>
 
-      <input
-        value={skillInput}
-        onChange={(e) => setSkillInput(e.target.value)}
-        placeholder="Enter skill"
-      />
+        <div style={styles.row}>
+          <input
+            placeholder="Enter skill"
+            value={skill}
+            onChange={(e) => setSkill(e.target.value)}
+            style={styles.input}
+          />
 
-      <select value={level} onChange={(e) => setLevel(e.target.value)}>
-        <option>Basic</option>
-        <option>Moderate</option>
-        <option>Advanced</option>
-      </select>
+          <select value={level} onChange={(e) => setLevel(e.target.value)} style={styles.select}>
+            <option>Basic</option>
+            <option>Moderate</option>
+            <option>Advanced</option>
+          </select>
 
-      <button onClick={addSkill}>Add</button>
+          <button onClick={addSkill} style={styles.addBtn}>Add</button>
+        </div>
 
-      <ul>
-        {skills.map((s, i) => (
-          <li key={i}>{s.skill} - {s.level}</li>
-        ))}
-      </ul>
+        <div style={styles.skillList}>
+          {skills.map((s, i) => (
+            <div key={i} style={styles.skillChip}>
+              {s.skill} • {s.level}
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* QUIZ RENDER */}
-      {[["aptitude", aptitudeQ], ["logical", logicalQ], ["verbal", verbalQ]].map(([section, questions]) => (
-        <div key={section}>
-          <h2>{section.toUpperCase()} TEST</h2>
+      {/* QUIZ */}
+      {[["aptitude", aptitude], ["logical", logical], ["verbal", verbal]].map(([sec, qs]) => (
+        <div key={sec} style={styles.card}>
+          <h2>{sec.toUpperCase()}</h2>
 
-          {questions.map((q, i) => (
+          {qs.map((q, i) => (
             <div key={i}>
               <p>{q.q}</p>
-              {q.options.map((opt) => (
+              {q.options.map(opt => (
                 <button
                   key={opt}
-                  onClick={() => handleAnswer(section, i, opt)}
+                  onClick={() => handleAnswer(sec, i, opt)}
+                  style={{
+                    ...styles.optBtn,
+                    background: answers[`${sec}-${i}`] === opt ? "#2563eb" : "#eee",
+                    color: answers[`${sec}-${i}`] === opt ? "#fff" : "#000"
+                  }}
                 >
                   {opt}
                 </button>
@@ -123,39 +178,77 @@ const Evaluation = () => {
         </div>
       ))}
 
-      {/* CAREER */}
-      <h2>Career Aspiration</h2>
-
-      <select
-        value={career.companyPreference}
-        onChange={(e) =>
-          setCareer({ ...career, companyPreference: e.target.value })
-        }
-      >
-        <option>Product Based</option>
-        <option>Service Based</option>
-        <option>Startup</option>
-      </select>
-
-      <input
-        placeholder="Interested Skill"
-        value={career.interestedSkill}
-        onChange={(e) =>
-          setCareer({ ...career, interestedSkill: e.target.value })
-        }
-      />
-
       {/* RESULT */}
-      <h2>Final Result</h2>
+      <div style={styles.result}>
+        <p>Skill Score: {calcSkillScore()} / 40</p>
+        <p>Quiz Score: {calcQuizScore().toFixed(2)} / 60</p>
+        <h2>{getFinalResult()}</h2>
+      </div>
 
-      <p>
-        Score: {calculateScore().score} / {calculateScore().total}
-      </p>
-
-      <h3>{getResult()}</h3>
+      <button onClick={handleSubmit} style={styles.submit}>
+        {loading ? "Submitting..." : "Submit Evaluation"}
+      </button>
 
     </div>
   );
+};
+
+const styles = {
+  page: { padding: "2rem", fontFamily: "Inter" },
+  title: { fontSize: "2rem", fontWeight: "900" },
+
+  card: {
+    background: "#fff",
+    padding: "1.5rem",
+    marginTop: "1rem",
+    borderRadius: "1rem",
+    boxShadow: "0 5px 20px rgba(0,0,0,0.05)"
+  },
+
+  row: { display: "flex", gap: "1rem" },
+
+  input: { padding: "0.5rem", borderRadius: "0.5rem" },
+  select: { padding: "0.5rem" },
+
+  addBtn: {
+    background: "#111",
+    color: "#fff",
+    padding: "0.5rem 1rem",
+    border: "none"
+  },
+
+  skillList: { marginTop: "1rem", display: "flex", gap: "0.5rem" },
+
+  skillChip: {
+    background: "#eef2ff",
+    padding: "0.5rem 1rem",
+    borderRadius: "999px"
+  },
+
+  optBtn: {
+    margin: "0.3rem",
+    padding: "0.5rem 1rem",
+    border: "none",
+    borderRadius: "0.5rem"
+  },
+
+  result: {
+    marginTop: "2rem",
+    padding: "1rem",
+    background: "#111",
+    color: "#fff",
+    borderRadius: "1rem"
+  },
+
+  submit: {
+    marginTop: "1rem",
+    padding: "1rem",
+    width: "100%",
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
+    borderRadius: "1rem"
+  }
 };
 
 export default Evaluation;
