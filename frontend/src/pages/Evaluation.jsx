@@ -1,233 +1,230 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Evaluation = () => {
-  const [sectionIndex, setSectionIndex] = useState(0);
-  const [questionIndex, setQuestionIndex] = useState(0);
+
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [skills, setSkills] = useState("");
-  const [company, setCompany] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(180);
 
-  const sections = ["aptitude", "logical", "verbal"];
+  // QUESTIONS
+  const questions = [
+    {
+      section: "Aptitude",
+      q: "A company produces 120 units/day. Efficiency drops by 25% for 4 days. Total production?",
+      options: ["360", "300", "400", "420"],
+      answer: "360"
+    },
+    {
+      section: "Logical",
+      q: "All engineers are coders. Some coders are designers. Which is true?",
+      options: [
+        "All engineers are designers",
+        "Some engineers may be designers",
+        "No engineers are designers",
+        "All designers are engineers"
+      ],
+      answer: "Some engineers may be designers"
+    },
+    {
+      section: "Verbal",
+      q: "Choose correct meaning: 'She executed the task flawlessly.'",
+      options: [
+        "With errors",
+        "Perfectly",
+        "Slowly",
+        "Carelessly"
+      ],
+      answer: "Perfectly"
+    }
+  ];
 
-  // 🌗 LOAD THEME
+  // TIMER
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
+    if (timeLeft > 0 && !submitted) {
+      const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(t);
     }
-  }, []);
+    if (timeLeft === 0) setSubmitted(true);
+  }, [timeLeft, submitted]);
 
-  // 🌗 TOGGLE
-  const toggleTheme = () => {
-    const root = document.documentElement;
-    root.classList.toggle("dark");
-
-    localStorage.setItem(
-      "theme",
-      root.classList.contains("dark") ? "dark" : "light"
-    );
+  // SELECT
+  const select = (val) => {
+    setAnswers({ ...answers, [step]: val });
   };
 
-  // QUESTIONS (5 EACH)
-  const questions = {
-    aptitude: [
-      { q: "2+2?", options: ["3", "4", "5"], answer: "4" },
-      { q: "10% of 200?", options: ["10", "20", "30"], answer: "20" },
-      { q: "5*5?", options: ["20", "25", "30"], answer: "25" },
-      { q: "Square of 6?", options: ["30", "36", "40"], answer: "36" },
-      { q: "Half of 50?", options: ["20", "25", "30"], answer: "25" }
-    ],
-    logical: [
-      { q: "All A are B. Some B are C?", options: ["Yes", "No"], answer: "Yes" },
-      { q: "Odd one: Cat, Dog, Car", options: ["Car", "Dog"], answer: "Car" },
-      { q: "Pattern: 2,4,8?", options: ["16", "12"], answer: "16" },
-      { q: "Sun rises from?", options: ["East", "West"], answer: "East" },
-      { q: "1,3,5?", options: ["7", "8"], answer: "7" }
-    ],
-    verbal: [
-      { q: "Synonym of fast?", options: ["Quick", "Slow"], answer: "Quick" },
-      { q: "Antonym of big?", options: ["Small", "Huge"], answer: "Small" },
-      { q: "Correct word?", options: ["Recieve", "Receive"], answer: "Receive" },
-      { q: "Meaning of 'clear'?", options: ["Clean", "Dirty"], answer: "Clean" },
-      { q: "Good means?", options: ["Bad", "Nice"], answer: "Nice" }
-    ]
-  };
+  // RESULT LOGIC
+  const getResult = () => {
+    let correct = 0;
+    let section = { Aptitude: 0, Logical: 0, Verbal: 0 };
 
-  const currentSection = sections[sectionIndex];
-  const currentQ = questions[currentSection][questionIndex];
-
-  const selectOption = (val) => {
-    setAnswers({
-      ...answers,
-      [`${currentSection}-${questionIndex}`]: val
-    });
-  };
-
-  const next = () => {
-    if (questionIndex < 4) {
-      setQuestionIndex(questionIndex + 1);
-    } else if (sectionIndex < 2) {
-      setSectionIndex(sectionIndex + 1);
-      setQuestionIndex(0);
-    } else {
-      setSectionIndex(3); // go to form
-    }
-  };
-
-  const calculateResult = () => {
-    let score = 0;
-    let total = 15;
-
-    Object.keys(questions).forEach((sec) => {
-      questions[sec].forEach((q, i) => {
-        if (answers[`${sec}-${i}`] === q.answer) score++;
-      });
+    questions.forEach((q, i) => {
+      if (answers[i] === q.answer) {
+        correct++;
+        section[q.section]++;
+      }
     });
 
-    const percent = (score / total) * 100;
+    const percent = (correct / questions.length) * 100;
 
-    let status = "";
-    if (percent >= 75 && skills && company) status = "READY ✅";
-    else if (percent >= 50) status = "ALMOST READY ⚠️";
-    else status = "NOT READY ❌";
+    let status = percent >= 75 ? "READY 🚀" :
+                 percent >= 50 ? "ALMOST READY ⚠️" :
+                 "NOT READY ❌";
 
-    return { score, percent, status };
+    return { correct, percent, status, section };
   };
 
-  // RESULT
+  // RESULT SCREEN
   if (submitted) {
-    const res = calculateResult();
+    const res = getResult();
 
     return (
-      <div style={styles.page}>
-        <Navbar toggleTheme={toggleTheme} />
-        <div style={styles.card}>
-          <h1>{res.status}</h1>
-          <p>Score: {res.score}/15</p>
-          <p>{res.percent.toFixed(1)}%</p>
-          <p>Skills: {skills}</p>
-          <p>Company: {company}</p>
-        </div>
-      </div>
-    );
-  }
+      <div className="min-h-screen bg-black text-white p-8">
 
-  // FORM AFTER QUESTIONS
-  if (sectionIndex === 3) {
-    return (
-      <div style={styles.page}>
-        <Navbar toggleTheme={toggleTheme} />
+        <div className="max-w-4xl mx-auto">
 
-        <div style={styles.card}>
-          <h2>Final Details</h2>
+          <h1 className="text-4xl font-bold mb-6">🎯 Assessment Result</h1>
 
-          <input
-            placeholder="Enter your skills"
-            onChange={(e) => setSkills(e.target.value)}
-            style={styles.input}
-          />
+          <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8">
 
-          <select onChange={(e) => setCompany(e.target.value)} style={styles.input}>
-            <option value="">Select Company Type</option>
-            <option>Product</option>
-            <option>Service</option>
-            <option>Startup</option>
-          </select>
+            <h2 className="text-5xl font-bold">{res.status}</h2>
+            <p className="mt-2 text-gray-400">
+              Score: {res.correct} / {questions.length} ({res.percent.toFixed(1)}%)
+            </p>
 
-          <button onClick={() => setSubmitted(true)} style={styles.btn}>
-            Get Result
-          </button>
-        </div>
-      </div>
-    );
-  }
+          </div>
 
-  // QUESTIONS UI
-  return (
-    <div style={styles.page}>
-      <Navbar toggleTheme={toggleTheme} />
+          {/* SECTION BREAKDOWN */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
 
-      <div style={styles.card}>
-        <h3>{currentSection.toUpperCase()}</h3>
-        <p>{currentQ.q}</p>
+            {Object.entries(res.section).map(([sec, val], i) => (
+              <div key={i} className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
 
-        {currentQ.options.map((opt) => (
+                <h3 className="font-bold mb-2">{sec}</h3>
+                <p className="text-3xl">{val}</p>
+
+              </div>
+            ))}
+
+          </div>
+
+          {/* FEEDBACK */}
+          <div className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
+
+            <h3 className="font-bold mb-3">Growth Insights 🧠</h3>
+
+            {res.section.Aptitude === 0 && <p>👉 Improve Aptitude problem solving</p>}
+            {res.section.Logical === 0 && <p>👉 Practice logical reasoning</p>}
+            {res.section.Verbal === 0 && <p>👉 Work on communication skills</p>}
+
+          </div>
+
           <button
-            key={opt}
-            onClick={() => selectOption(opt)}
-            style={{
-              ...styles.option,
-              background:
-                answers[`${currentSection}-${questionIndex}`] === opt
-                  ? "#2563eb"
-                  : "#e5e7eb"
-            }}
+            onClick={() => navigate("/dashboard")}
+            className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"
           >
-            {opt}
+            Back to Dashboard
           </button>
-        ))}
 
-        <button onClick={next} style={styles.btn}>
-          Next
-        </button>
+        </div>
+      </div>
+    );
+  }
+
+  const q = questions[step];
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center px-8 py-4 border-b border-white/10 backdrop-blur-xl">
+        <h2 className="text-xl font-bold">Assessment</h2>
+        <span className="text-purple-400">⏱ {timeLeft}s</span>
+      </div>
+
+      <div className="max-w-4xl mx-auto p-6">
+
+        {/* PROGRESS */}
+        <div className="h-2 bg-white/10 rounded-full mb-6">
+          <div
+            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+            style={{ width: `${((step + 1) / questions.length) * 100}%` }}
+          />
+        </div>
+
+        {/* QUESTION CARD */}
+        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl">
+
+          <p className="text-sm text-gray-400 mb-2">{q.section}</p>
+
+          <h3 className="text-xl font-semibold mb-4">{q.q}</h3>
+
+          <div className="space-y-3">
+            {q.options.map(opt => (
+              <button
+                key={opt}
+                onClick={() => select(opt)}
+                className={`w-full text-left px-4 py-3 rounded-xl transition 
+                ${answers[step] === opt 
+                  ? "bg-purple-600 text-white" 
+                  : "bg-white/10 hover:bg-white/20"}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+
+          {/* NAV */}
+          <div className="flex justify-between mt-6">
+
+            <button
+              disabled={step === 0}
+              onClick={() => setStep(step - 1)}
+              className="px-4 py-2 bg-white/10 rounded-lg"
+            >
+              Prev
+            </button>
+
+            {step === questions.length - 1 ? (
+              <button
+                onClick={() => setSubmitted(true)}
+                className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl"
+              >
+                Submit 🚀
+              </button>
+            ) : (
+              <button
+                onClick={() => setStep(step + 1)}
+                className="px-4 py-2 bg-white/10 rounded-lg"
+              >
+                Next
+              </button>
+            )}
+
+          </div>
+
+        </div>
+
+        {/* NAVIGATOR */}
+        <div className="flex gap-2 mt-6 flex-wrap">
+          {questions.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setStep(i)}
+              className={`w-10 h-10 rounded-full 
+              ${answers[i] ? "bg-green-500" : "bg-white/10"}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+
       </div>
     </div>
   );
-};
-
-// NAVBAR
-const Navbar = ({ toggleTheme }) => (
-  <div style={styles.nav}>
-    <h2>🚀 MyApp</h2>
-    <div>
-      <button onClick={toggleTheme}>🌙</button>
-      <span style={styles.avatar}>M</span>
-    </div>
-  </div>
-);
-
-// STYLES
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "var(--bg)",
-    color: "var(--text)"
-  },
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "1rem",
-    background: "var(--card)"
-  },
-  card: {
-    padding: "2rem",
-    margin: "2rem",
-    background: "var(--card)"
-  },
-  option: {
-    display: "block",
-    margin: "10px",
-    padding: "10px"
-  },
-  btn: {
-    marginTop: "10px",
-    padding: "10px",
-    background: "#16a34a",
-    color: "#fff"
-  },
-  input: {
-    display: "block",
-    margin: "10px 0",
-    padding: "10px"
-  },
-  avatar: {
-    marginLeft: "10px",
-    background: "#2563eb",
-    color: "#fff",
-    padding: "8px",
-    borderRadius: "50%"
-  }
 };
 
 export default Evaluation;
