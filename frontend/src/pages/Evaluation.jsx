@@ -4,11 +4,13 @@ import ProjectLogo from "../components/Logo";
 
 const Evaluation = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
+  const [activeSectionIndex, setActiveSectionIndex] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+  const [scores, setScores] = useState({});
+  const [showResult, setShowResult] = useState(false);
 
-  // 🌙 Load theme
+  // 🌙 THEME LOAD
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -44,183 +46,126 @@ const Evaluation = () => {
 
   const t = darkMode ? theme.dark : theme.light;
 
-  // 🎯 QUESTION BANK (SCENARIO BASED)
+  // 🧠 SECTIONS ORDER
+  const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
+
+  // 📚 QUESTION BANK
   const questionBank = {
     Aptitude: [
-      {
-        q: "A company reduces cost by 20%. Original cost = 500. New cost?",
-        options: ["400", "450", "420", "380"]
-      },
-      {
-        q: "Production doubles every day. Day1=5 units. Day3?",
-        options: ["20", "15", "10", "25"]
-      },
-      {
-        q: "A train travels 60km in 1 hour. Distance in 3 hours?",
-        options: ["180", "120", "200", "150"]
-      },
-      {
-        q: "Profit = 200, cost = 800. Profit %?",
-        options: ["25%", "20%", "30%", "40%"]
-      },
-      {
-        q: "Simple interest on 1000 at 10% for 2 years?",
-        options: ["200", "100", "300", "400"]
-      }
+      { q: "Cost reduced by 20% from 500?", options: ["400","450","420","380"], ans: "400" },
+      { q: "5 units double daily. Day3?", options: ["20","15","10","25"], ans: "20" },
+      { q: "60km/hr for 3 hrs?", options: ["180","150","120","200"], ans: "180" },
+      { q: "Profit 200 on 800?", options: ["25%","20%","30%","40%"], ans: "25%" },
+      { q: "SI on 1000 @10% 2yr?", options: ["200","100","300","400"], ans: "200" }
     ],
-
     Logical: [
-      {
-        q: "All cats are animals. Some animals are black. Conclusion?",
-        options: [
-          "All cats are black",
-          "Some cats may be black",
-          "No cats are black",
-          "All animals are cats"
-        ]
-      },
-      {
-        q: "If A>B and B>C, then?",
-        options: ["A>C", "C>A", "A=B", "None"]
-      },
-      {
-        q: "Odd one out: Apple, Mango, Carrot, Banana",
-        options: ["Carrot", "Apple", "Mango", "Banana"]
-      },
-      {
-        q: "Find next: 2,4,8,16,...",
-        options: ["32", "24", "20", "18"]
-      },
-      {
-        q: "Mirror of LEFT?",
-        options: ["TFEL", "LEFT", "EF TL", "None"]
-      }
+      { q: "All devs testers. Some testers mgrs?", options: ["All","Some may","None","All mgr"], ans: "Some may" },
+      { q: "A>B, B>C?", options: ["A>C","C>A","A=B","None"], ans: "A>C" },
+      { q: "Odd one?", options: ["Carrot","Apple","Mango","Banana"], ans: "Carrot" },
+      { q: "2,4,8,16?", options: ["32","24","20","18"], ans: "32" },
+      { q: "Mirror LEFT?", options: ["TFEL","LEFT","EF","None"], ans: "TFEL" }
     ],
-
     Verbal: [
-      {
-        q: "‘Efficient’ means?",
-        options: ["Productive", "Lazy", "Slow", "Weak"]
-      },
-      {
-        q: "Synonym of ‘Rapid’?",
-        options: ["Fast", "Slow", "Late", "Stop"]
-      },
-      {
-        q: "Correct sentence?",
-        options: [
-          "She go to school",
-          "She goes to school",
-          "She going school",
-          "She gone school"
-        ]
-      },
-      {
-        q: "Opposite of ‘Strong’?",
-        options: ["Weak", "Hard", "Solid", "Big"]
-      },
-      {
-        q: "‘Execute’ means?",
-        options: ["Perform", "Stop", "Break", "Cancel"]
-      }
+      { q: "Efficient?", options: ["Productive","Lazy","Slow","Weak"], ans: "Productive" },
+      { q: "Rapid?", options: ["Fast","Slow","Late","Stop"], ans: "Fast" },
+      { q: "Correct sentence?", options: ["She go","She goes","She going","She gone"], ans: "She goes" },
+      { q: "Opposite strong?", options: ["Weak","Hard","Big","Solid"], ans: "Weak" },
+      { q: "Execute?", options: ["Perform","Stop","Break","Cancel"], ans: "Perform" }
     ],
-
     Technical: [
-      {
-        q: "C language is?",
-        options: ["Procedural", "Object oriented", "Scripting", "Markup"]
-      },
-      {
-        q: "OS manages?",
-        options: ["Hardware", "Programs", "Memory", "All"]
-      },
-      {
-        q: "TCP belongs to?",
-        options: ["Transport", "Network", "Data Link", "Physical"]
-      },
-      {
-        q: "Java is?",
-        options: ["OOP", "Procedural", "Functional", "None"]
-      },
-      {
-        q: "RAM is?",
-        options: ["Temporary", "Permanent", "External", "None"]
-      }
+      { q: "C is?", options: ["Procedural","OOP","Script","Markup"], ans: "Procedural" },
+      { q: "OS manages?", options: ["HW","Programs","Memory","All"], ans: "All" },
+      { q: "TCP layer?", options: ["Transport","Network","DL","Physical"], ans: "Transport" },
+      { q: "Java is?", options: ["OOP","Procedural","None","Func"], ans: "OOP" },
+      { q: "RAM?", options: ["Temporary","Permanent","External","None"], ans: "Temporary" }
     ]
   };
 
   // 🎲 RANDOM QUESTIONS
-  const getRandomQuestions = (section) => {
-    const shuffled = [...questionBank[section]].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 5); // show 5 random
+  const getRandom = (sec) => {
+    return [...questionBank[sec]].sort(() => 0.5 - Math.random()).slice(0, 5);
   };
 
-  // ▶️ START TEST
-  const startTest = (section) => {
-    setActiveSection(section);
-    setQuestions(getRandomQuestions(section));
+  // ▶ START TEST
+  const startTest = (index) => {
+    const sec = sections[index];
+    setActiveSectionIndex(index);
+    setQuestions(getRandom(sec));
     setAnswers({});
   };
 
-  // ❌ BACK
-  const goBack = () => {
-    setActiveSection(null);
+  // ✅ SUBMIT SECTION
+  const submitSection = () => {
+    const sec = sections[activeSectionIndex];
+    let score = 0;
+
+    questions.forEach((q, i) => {
+      if (answers[i] === q.ans) score++;
+    });
+
+    setScores(prev => ({ ...prev, [sec]: score }));
+
+    // 👉 NEXT SECTION
+    if (activeSectionIndex < sections.length - 1) {
+      startTest(activeSectionIndex + 1);
+    } else {
+      setShowResult(true);
+      setActiveSectionIndex(null);
+    }
   };
 
-  // ANSWER SELECT
-  const selectAnswer = (index, value) => {
-    setAnswers({ ...answers, [index]: value });
-  };
+  // 🎯 FINAL RESULT
+  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+  const percent = (totalScore / (sections.length * 5)) * 100;
+
+  let status = "";
+  if (percent >= 75) status = "READY ✅";
+  else if (percent >= 50) status = "ALMOST READY ⚠️";
+  else status = "NOT READY ❌";
 
   return (
     <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
 
-      {/* 🔝 NAVBAR */}
-      <nav style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "1rem 2rem",
-        borderBottom: "1px solid #ccc"
-      }}>
+      {/* NAVBAR */}
+      <nav style={{ display: "flex", justifyContent: "space-between", padding: "1rem 2rem" }}>
         <ProjectLogo />
-
         <div style={{ display: "flex", gap: "15px" }}>
-          <button onClick={toggleTheme}>
-            {darkMode ? "🌞" : "🌙"}
-          </button>
+          <button onClick={toggleTheme}>{darkMode ? "🌞" : "🌙"}</button>
           <SidebarMenu color={t.text} />
         </div>
       </nav>
 
       <div style={{ maxWidth: "800px", margin: "auto", padding: "2rem" }}>
 
-        {/* 🧠 QUESTION SCREEN */}
-        {activeSection ? (
-          <>
-            <button onClick={goBack}>⬅ Back</button>
+        {/* 🎯 RESULT */}
+        {showResult && (
+          <div style={{ padding: "2rem", background: t.card, borderRadius: "12px" }}>
+            <h2>Final Result</h2>
+            <h1>{status}</h1>
+            <p>Score: {totalScore}</p>
+            <p>{percent.toFixed(1)}%</p>
+          </div>
+        )}
 
-            <h2>{activeSection} Test</h2>
+        {/* 🧠 QUESTIONS */}
+        {activeSectionIndex !== null && !showResult && (
+          <>
+            <h2>{sections[activeSectionIndex]} Test</h2>
 
             {questions.map((q, i) => (
-              <div key={i} style={{
-                margin: "1rem 0",
-                padding: "1rem",
-                background: t.card,
-                borderRadius: "10px"
-              }}>
+              <div key={i} style={{ margin: "1rem 0", padding: "1rem", background: t.card }}>
                 <p>{q.q}</p>
 
                 {q.options.map(opt => (
                   <button
                     key={opt}
-                    onClick={() => selectAnswer(i, opt)}
+                    onClick={() => setAnswers({ ...answers, [i]: opt })}
                     style={{
                       display: "block",
                       margin: "5px 0",
                       background: answers[i] === opt ? t.primary : "#ddd",
                       color: answers[i] === opt ? "#fff" : "#000",
                       padding: "6px",
-                      borderRadius: "6px",
                       border: "none"
                     }}
                   >
@@ -229,13 +174,18 @@ const Evaluation = () => {
                 ))}
               </div>
             ))}
+
+            <button onClick={submitSection}>Submit & Next →</button>
           </>
-        ) : (
+        )}
+
+        {/* 📦 MAIN UI (UNCHANGED) */}
+        {activeSectionIndex === null && !showResult && (
           <>
             <h1>Assessment</h1>
 
-            {Object.keys(questionBank).map((sec) => (
-              <div key={sec} style={{
+            {sections.map((sec, i) => (
+              <div key={i} style={{
                 padding: "20px",
                 marginBottom: "15px",
                 background: t.card,
@@ -244,10 +194,7 @@ const Evaluation = () => {
                 justifyContent: "space-between"
               }}>
                 <h3>{sec}</h3>
-
-                <button onClick={() => startTest(sec)}>
-                  Take Assessment →
-                </button>
+                <button onClick={() => startTest(i)}>Take Assessment →</button>
               </div>
             ))}
           </>
