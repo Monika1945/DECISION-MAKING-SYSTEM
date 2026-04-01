@@ -1,217 +1,218 @@
 import React, { useState, useEffect } from "react";
+import SidebarMenu from "../components/SidebarMenu";
+import ProjectLogo from "../components/Logo";
 
 const Evaluation = () => {
+  const [darkMode, setDarkMode] = useState(false);
 
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
-  const [time, setTime] = useState(300);
+  // 🌙 Load saved theme
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      setDarkMode(true);
+    }
+  }, []);
 
-  // ADVANCED QUESTIONS
-  const questions = [
+  // 🌗 Toggle theme
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    root.classList.toggle("dark");
+
+    const isDark = root.classList.contains("dark");
+    setDarkMode(isDark);
+
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  };
+
+  const theme = {
+    light: {
+      bg: "linear-gradient(135deg,#f8fafc,#eef2ff)",
+      card: "rgba(255,255,255,0.7)",
+      text: "#0f172a",
+      sub: "#64748b",
+      border: "#e2e8f0",
+      primary: "#4f46e5"
+    },
+    dark: {
+      bg: "linear-gradient(135deg,#020617,#0f172a)",
+      card: "rgba(30,41,59,0.6)",
+      text: "#f1f5f9",
+      sub: "#94a3b8",
+      border: "#334155",
+      primary: "#6366f1"
+    }
+  };
+
+  const t = darkMode ? theme.dark : theme.light;
+
+  const sections = [
     {
-      section: "Aptitude",
-      q: "A manufacturing unit produces 200 units/day. Due to machine downtime, production reduces by 30% for 5 days. What is total production during these days?",
-      options: ["700", "750", "800", "900"],
-      answer: "700"
+      title: "Aptitude",
+      desc: "Problem solving, speed & accuracy"
     },
     {
-      section: "Logical",
-      q: "If all analysts are programmers and some programmers are managers, which conclusion is valid?",
-      options: [
-        "All analysts are managers",
-        "Some analysts may be managers",
-        "No analyst is a manager",
-        "All managers are analysts"
-      ],
-      answer: "Some analysts may be managers"
+      title: "Logical",
+      desc: "Reasoning and thinking ability"
     },
     {
-      section: "Verbal",
-      q: "Choose correct interpretation: 'The system scaled efficiently under load.'",
-      options: [
-        "It failed under pressure",
-        "It handled increased demand well",
-        "It slowed down significantly",
-        "It stopped working"
-      ],
-      answer: "It handled increased demand well"
+      title: "Verbal",
+      desc: "English and communication skills"
+    },
+    {
+      title: "Analytical Thinking",
+      desc: "Decision making and problem solving"
+    },
+    {
+      title: "Technical",
+      desc: "C, Java, OS, Computer Networks"
+    },
+    {
+      title: "Interest",
+      desc: "ML, Web Development, AI"
+    },
+    {
+      title: "Company Preference",
+      desc: "Product, Service, Startup"
     }
   ];
 
-  // TIMER
-  useEffect(() => {
-    if (time > 0 && !submitted) {
-      const t = setTimeout(() => setTime(time - 1), 1000);
-      return () => clearTimeout(t);
-    }
-    if (time === 0) setSubmitted(true);
-  }, [time, submitted]);
-
-  const select = (val) => {
-    setAnswers({ ...answers, [step]: val });
-  };
-
-  const submit = () => setSubmitted(true);
-
-  // RESULT ENGINE
-  const analyze = () => {
-    let correct = 0;
-    let section = { Aptitude: 0, Logical: 0, Verbal: 0 };
-
-    questions.forEach((q, i) => {
-      if (answers[i] === q.answer) {
-        correct++;
-        section[q.section]++;
-      }
-    });
-
-    const percent = (correct / questions.length) * 100;
-
-    const feedback = [];
-    if (section.Aptitude < 1) feedback.push("📉 Improve quantitative problem solving");
-    if (section.Logical < 1) feedback.push("🧠 Strengthen logical reasoning");
-    if (section.Verbal < 1) feedback.push("🗣 Enhance communication clarity");
-
-    return { correct, percent, section, feedback };
-  };
-
-  // RESULT UI
-  if (submitted) {
-    const res = analyze();
-
-    return (
-      <div className="min-h-screen bg-black text-white p-10">
-
-        <div className="max-w-5xl mx-auto">
-
-          <h1 className="text-4xl font-bold mb-8">🚀 Performance Report</h1>
-
-          {/* MAIN SCORE */}
-          <div className="p-10 rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 text-center mb-10">
-
-            <h2 className="text-6xl font-bold">{res.percent.toFixed(0)}%</h2>
-            <p className="mt-2 text-lg">Hireability Score</p>
-
-          </div>
-
-          {/* SECTION CARDS */}
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
-
-            {Object.entries(res.section).map(([sec, val]) => (
-              <div key={sec} className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
-                <h3 className="font-bold mb-2">{sec}</h3>
-                <p className="text-3xl">{val}</p>
-              </div>
-            ))}
-
-          </div>
-
-          {/* FEEDBACK */}
-          <div className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
-
-            <h3 className="font-bold mb-3">AI Insights 🧠</h3>
-
-            {res.feedback.length === 0 ? (
-              <p>🔥 Excellent! You are placement ready.</p>
-            ) : (
-              res.feedback.map((f, i) => <p key={i}>👉 {f}</p>)
-            )}
-
-          </div>
-
-        </div>
-      </div>
-    );
-  }
-
-  const q = questions[step];
-
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: t.bg,
+        color: t.text,
+        transition: "0.4s"
+      }}
+    >
+      {/* 🔝 NAVBAR */}
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "1rem 2rem",
+          backdropFilter: "blur(20px)",
+          borderBottom: `1px solid ${t.border}`,
+          position: "sticky",
+          top: 0,
+          zIndex: 10
+        }}
+      >
+        <ProjectLogo />
 
-      {/* HEADER */}
-      <div className="flex justify-between px-8 py-4 border-b border-white/10 backdrop-blur-xl">
-        <h2 className="font-bold">Assessment Engine</h2>
-        <span className="text-purple-400">⏱ {time}s</span>
-      </div>
+        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+          {/* 🌙 THEME */}
+          <button
+            onClick={toggleTheme}
+            style={{
+              padding: "8px 14px",
+              borderRadius: "20px",
+              border: "none",
+              background: t.primary,
+              color: "white",
+              cursor: "pointer"
+            }}
+          >
+            {darkMode ? "🌞 Light" : "🌙 Dark"}
+          </button>
 
-      <div className="max-w-4xl mx-auto p-6">
-
-        {/* PROGRESS */}
-        <div className="h-2 bg-white/10 rounded-full mb-6">
+          {/* 👤 AVATAR */}
           <div
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-            style={{ width: `${((step + 1) / questions.length) * 100}%` }}
-          />
-        </div>
-
-        {/* CARD */}
-        <div className="p-8 bg-white/10 rounded-3xl backdrop-blur-xl">
-
-          <p className="text-sm text-gray-400">{q.section}</p>
-          <h3 className="text-xl font-semibold mt-2">{q.q}</h3>
-
-          <div className="mt-5 space-y-3">
-            {q.options.map(opt => (
-              <button
-                key={opt}
-                onClick={() => select(opt)}
-                className={`w-full px-4 py-3 rounded-xl text-left transition
-                  ${answers[step] === opt 
-                    ? "bg-purple-600" 
-                    : "bg-white/10 hover:bg-white/20"}`}
-              >
-                {opt}
-              </button>
-            ))}
+            style={{
+              width: "38px",
+              height: "38px",
+              borderRadius: "50%",
+              background: t.primary,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontWeight: "bold"
+            }}
+          >
+            M
           </div>
 
-          {/* NAV */}
-          <div className="flex justify-between mt-6">
-
-            <button
-              disabled={step === 0}
-              onClick={() => setStep(step - 1)}
-              className="px-4 py-2 bg-white/10 rounded-lg"
-            >
-              Prev
-            </button>
-
-            {step === questions.length - 1 ? (
-              <button
-                onClick={submit}
-                className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl"
-              >
-                Submit 🚀
-              </button>
-            ) : (
-              <button
-                onClick={() => setStep(step + 1)}
-                className="px-4 py-2 bg-white/10 rounded-lg"
-              >
-                Next
-              </button>
-            )}
-
-          </div>
-
+          {/* ☰ MENU */}
+          <SidebarMenu color={t.text} />
         </div>
+      </nav>
 
-        {/* QUESTION PALETTE */}
-        <div className="flex gap-2 mt-6 flex-wrap">
-          {questions.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setStep(i)}
-              className={`w-10 h-10 rounded-full 
-                ${answers[i] ? "bg-green-500" : "bg-white/10"}`}
+      {/* 📦 CONTENT */}
+      <div
+        style={{
+          maxWidth: "900px",
+          margin: "auto",
+          padding: "3rem 1.5rem"
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "3rem",
+            fontWeight: "900",
+            marginBottom: "2rem"
+          }}
+        >
+          Assessment
+        </h1>
+
+        {/* 🔥 BOXES */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {sections.map((sec, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "20px 25px",
+                borderRadius: "18px",
+                background: t.card,
+                backdropFilter: "blur(20px)",
+                border: `1px solid ${t.border}`,
+                transition: "0.3s"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow =
+                  "0 20px 40px rgba(0,0,0,0.25)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "none";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
-              {i + 1}
-            </button>
+              {/* LEFT */}
+              <div>
+                <h3
+                  style={{
+                    fontSize: "1.4rem",
+                    fontWeight: "800"
+                  }}
+                >
+                  {sec.title}
+                </h3>
+                <p style={{ color: t.sub }}>{sec.desc}</p>
+              </div>
+
+              {/* RIGHT BUTTON */}
+              <button
+                style={{
+                  background: "#000",
+                  color: "#fff",
+                  padding: "10px 18px",
+                  borderRadius: "10px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontWeight: "600"
+                }}
+              >
+                Take Assessment →
+              </button>
+            </div>
           ))}
         </div>
-
       </div>
     </div>
   );
