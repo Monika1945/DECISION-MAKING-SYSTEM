@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import SidebarMenu from "../components/SidebarMenu";
 import ProjectLogo from "../components/Logo";
-import { useNavigate } from "react-router-dom";
+
+const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
 const Evaluation = () => {
   const navigate = useNavigate();
@@ -11,7 +14,10 @@ const Evaluation = () => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [scores, setScores] = useState({});
+  const [selectedCompany, setSelectedCompany] = useState("");
+  const [interest, setInterest] = useState("");
 
+  // 🌙 Load theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -29,131 +35,59 @@ const Evaluation = () => {
   };
 
   const theme = {
-    light: { bg: "#f8fafc", card: "#fff", text: "#111", primary: "#4f46e5" },
-    dark: { bg: "#020617", card: "#1e293b", text: "#fff", primary: "#6366f1" }
+    light: {
+      bg: "#f8fafc",
+      card: "#ffffff",
+      text: "#0f172a",
+      sub: "#64748b",
+      primary: "#4f46e5"
+    },
+    dark: {
+      bg: "#020617",
+      card: "#1e293b",
+      text: "#f1f5f9",
+      sub: "#94a3b8",
+      primary: "#6366f1"
+    }
   };
 
   const t = darkMode ? theme.dark : theme.light;
 
   const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
 
-  // 🔥 BIG SCENARIO QUESTIONS
+  // 📚 BIG SCENARIO QUESTIONS
   const questionBank = {
     Aptitude: [
-      {
-        q: "A startup produces 150 units/day. Due to system failure, productivity drops by 30% for 2 days and increases by 20% on the third day. What is total production?",
-        options: ["351", "360", "375", "390"],
-        ans: "351"
-      },
-      {
-        q: "A company invests ₹50,000 at 10% annual simple interest. What is the total amount after 3 years?",
-        options: ["65000", "66000", "64000", "68000"],
-        ans: "65000"
-      },
-      {
-        q: "A train covers 120 km in 2 hours. If speed increases by 25%, how long to cover 150 km?",
-        options: ["2 hr", "2.5 hr", "3 hr", "1.5 hr"],
-        ans: "2 hr"
-      },
-      {
-        q: "A person buys a laptop for 40,000 and sells it at 20% profit. Selling price?",
-        options: ["48000", "46000", "50000", "44000"],
-        ans: "48000"
-      },
-      {
-        q: "A worker completes a task in 10 days. Another in 5 days. Together?",
-        options: ["3.33", "4", "2", "5"],
-        ans: "3.33"
-      }
+      { q: "A company reduces cost by 20% from ₹500. New cost?", options: ["400","450","420","380"], ans: "400" },
+      { q: "Salary increases 10% yearly. After 2 yrs ₹10000?", options: ["12100","11000","12000","12200"], ans: "12100" },
+      { q: "Train 60km/hr for 3 hrs distance?", options: ["180","150","200","210"], ans: "180" },
+      { q: "Profit ₹200 on ₹800 investment?", options: ["25%","20%","30%","40%"], ans: "25%" },
+      { q: "Simple Interest ₹1000 @10% 2 yrs?", options: ["200","100","300","400"], ans: "200" },
+      { q: "Ratio 2:3 total 100?", options: ["40,60","50,50","30,70","20,80"], ans: "40,60" }
     ],
 
     Logical: [
-      {
-        q: "All engineers are problem solvers. Some problem solvers are leaders. Which is correct?",
-        options: [
-          "All engineers are leaders",
-          "Some engineers may be leaders",
-          "No engineer is a leader",
-          "All leaders are engineers"
-        ],
-        ans: "Some engineers may be leaders"
-      },
-      {
-        q: "If coding is faster than testing and testing is faster than debugging, then?",
-        options: ["Coding > Debugging", "Debugging > Coding", "Same", "None"],
-        ans: "Coding > Debugging"
-      },
-      {
-        q: "Find odd: CPU, RAM, SSD, Keyboard",
-        options: ["Keyboard", "CPU", "RAM", "SSD"],
-        ans: "Keyboard"
-      },
-      {
-        q: "Series: 3, 9, 27, ?",
-        options: ["81", "72", "90", "60"],
-        ans: "81"
-      },
-      {
-        q: "Mirror of CODE?",
-        options: ["EDOC", "CODE", "OCED", "None"],
-        ans: "EDOC"
-      }
+      { q: "All devs testers. Some testers managers?", options: ["All","Some may","None","All mgr"], ans: "Some may" },
+      { q: "A > B, B > C. Relation?", options: ["A > C","C > A","Equal","None"], ans: "A > C" },
+      { q: "Odd one: Apple, Mango, Carrot, Banana", options: ["Carrot","Apple","Mango","Banana"], ans: "Carrot" },
+      { q: "Series: 2,4,8,16 ?", options: ["32","24","20","18"], ans: "32" },
+      { q: "Mirror LEFT?", options: ["TFEL","LEFT","EF","None"], ans: "TFEL" }
     ],
 
     Verbal: [
-      {
-        q: "‘Robust system’ means?",
-        options: ["Strong", "Weak", "Slow", "Broken"],
-        ans: "Strong"
-      },
-      {
-        q: "Synonym of ‘Enhance’?",
-        options: ["Improve", "Reduce", "Stop", "Break"],
-        ans: "Improve"
-      },
-      {
-        q: "Choose correct: He ___ working yesterday.",
-        options: ["was", "is", "are", "were"],
-        ans: "was"
-      },
-      {
-        q: "Opposite of ‘Flexible’?",
-        options: ["Rigid", "Soft", "Elastic", "Loose"],
-        ans: "Rigid"
-      },
-      {
-        q: "‘Deploy’ means?",
-        options: ["Release", "Stop", "Delete", "Break"],
-        ans: "Release"
-      }
+      { q: "Efficient means?", options: ["Productive","Lazy","Slow","Weak"], ans: "Productive" },
+      { q: "Rapid means?", options: ["Fast","Slow","Late","Stop"], ans: "Fast" },
+      { q: "Correct: She ___ going", options: ["is","are","was","be"], ans: "is" },
+      { q: "Opposite of strong?", options: ["Weak","Hard","Big","Solid"], ans: "Weak" },
+      { q: "Execute means?", options: ["Perform","Stop","Break","Cancel"], ans: "Perform" }
     ],
 
     Technical: [
-      {
-        q: "Which data structure uses FIFO?",
-        options: ["Queue", "Stack", "Tree", "Graph"],
-        ans: "Queue"
-      },
-      {
-        q: "Which OS concept allows multitasking?",
-        options: ["Process Scheduling", "Paging", "Segmentation", "Deadlock"],
-        ans: "Process Scheduling"
-      },
-      {
-        q: "Java supports?",
-        options: ["OOP", "Procedural", "None", "Only scripting"],
-        ans: "OOP"
-      },
-      {
-        q: "Which protocol is used for web?",
-        options: ["HTTP", "FTP", "SMTP", "TCP"],
-        ans: "HTTP"
-      },
-      {
-        q: "Which memory is fastest?",
-        options: ["Cache", "RAM", "ROM", "Disk"],
-        ans: "Cache"
-      }
+      { q: "C language type?", options: ["Procedural","OOP","Script","Markup"], ans: "Procedural" },
+      { q: "OS manages?", options: ["HW","Programs","Memory","All"], ans: "All" },
+      { q: "TCP layer?", options: ["Transport","Network","DL","Physical"], ans: "Transport" },
+      { q: "Java is?", options: ["OOP","Procedural","None","Func"], ans: "OOP" },
+      { q: "RAM type?", options: ["Temporary","Permanent","External","None"], ans: "Temporary" }
     ]
   };
 
@@ -176,36 +110,74 @@ const Evaluation = () => {
       if (answers[i] === q.ans) score++;
     });
 
-    const updatedScores = { ...scores, [sec]: score };
-    setScores(updatedScores);
+    setScores(prev => ({ ...prev, [sec]: score }));
 
-    // 👉 FINAL REDIRECT
-    if (activeSectionIndex === sections.length - 1) {
-      const total = Object.values(updatedScores).reduce((a, b) => a + b, 0);
-      const percent = (total / (sections.length * 5)) * 100;
-
-      let status = "";
-      if (percent >= 75) status = "READY";
-      else if (percent >= 50) status = "ALMOST READY";
-      else status = "NOT READY";
-
-      navigate("/result", {
-        state: { total, percent, status }
-      });
-
-    } else {
+    if (activeSectionIndex < sections.length - 1) {
       startTest(activeSectionIndex + 1);
+    } else {
+      setActiveSectionIndex(null);
+    }
+  };
+
+  const generateRecommendations = () => {
+    let rec = [];
+
+    if ((scores.Aptitude || 0) < 3) rec.push("Improve aptitude skills");
+    if ((scores.Logical || 0) < 3) rec.push("Practice logical reasoning");
+    if ((scores.Verbal || 0) < 3) rec.push("Improve communication");
+    if ((scores.Technical || 0) < 3) rec.push("Focus on core subjects");
+
+    return rec;
+  };
+
+  const handleFinalSubmit = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
+
+    const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+    const percent = (totalScore / 20) * 100;
+
+    let status = "";
+    if (percent >= 75) status = "READY";
+    else if (percent >= 50) status = "ALMOST READY";
+    else status = "NOT READY";
+
+    try {
+      const res = await axios.post(
+        `${API_BASE}/api/evaluation`,
+        {
+          aptitudeScore: scores.Aptitude || 0,
+          logicalScore: scores.Logical || 0,
+          communicationScore: scores.Verbal || 0,
+          technicalScore: scores.Technical || 0,
+          leadershipScore: 0,
+          totalScore,
+          status,
+          companyPreference: selectedCompany,
+          interest,
+          recommendations: generateRecommendations()
+        },
+        { headers: { "x-auth-token": token } }
+      );
+
+      navigate(`/result?id=${res.data._id}`);
+
+    } catch (err) {
+      console.error(err);
+      alert("Submission failed");
     }
   };
 
   return (
     <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
 
-      {/* NAV */}
+      {/* NAVBAR */}
       <nav style={{ display: "flex", justifyContent: "space-between", padding: "1rem 2rem" }}>
         <ProjectLogo />
-        <div style={{ display: "flex", gap: "15px" }}>
-          <button onClick={toggleTheme}>{darkMode ? "🌞" : "🌙"}</button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={toggleTheme}>
+            {darkMode ? "🌞" : "🌙"}
+          </button>
           <SidebarMenu color={t.text} />
         </div>
       </nav>
@@ -213,14 +185,13 @@ const Evaluation = () => {
       <div style={{ maxWidth: "800px", margin: "auto", padding: "2rem" }}>
 
         {/* QUESTIONS */}
-        {activeSectionIndex !== null ? (
+        {activeSectionIndex !== null && (
           <>
-            <h2>{sections[activeSectionIndex]} Test</h2>
+            <h2>{sections[activeSectionIndex]}</h2>
 
             {questions.map((q, i) => (
-              <div key={i} style={{ margin: "1rem 0", padding: "1rem", background: t.card }}>
+              <div key={i}>
                 <p>{q.q}</p>
-
                 {q.options.map(opt => (
                   <button
                     key={opt}
@@ -228,9 +199,8 @@ const Evaluation = () => {
                     style={{
                       display: "block",
                       margin: "5px 0",
-                      background: answers[i] === opt ? t.primary : "#ddd",
-                      color: answers[i] === opt ? "#fff" : "#000",
-                      padding: "6px"
+                      background: answers[i] === opt ? t.primary : "#ccc",
+                      color: "#fff"
                     }}
                   >
                     {opt}
@@ -239,28 +209,41 @@ const Evaluation = () => {
               </div>
             ))}
 
-            <button onClick={submitSection}>
-              {activeSectionIndex === sections.length - 1
-                ? "Final Submit 🚀"
-                : "Submit & Next →"}
-            </button>
+            <button onClick={submitSection}>Submit & Next →</button>
           </>
-        ) : (
+        )}
+
+        {/* MAIN */}
+        {activeSectionIndex === null && (
           <>
             <h1>Assessment</h1>
 
             {sections.map((sec, i) => (
-              <div key={i} style={{
-                padding: "20px",
-                marginBottom: "15px",
-                background: t.card,
-                display: "flex",
-                justifyContent: "space-between"
-              }}>
+              <div key={i}>
                 <h3>{sec}</h3>
-                <button onClick={() => startTest(i)}>Take Assessment →</button>
+                <button onClick={() => startTest(i)}>Take Assessment</button>
               </div>
             ))}
+
+            {/* INTEREST */}
+            <h3>Select Interest</h3>
+            <select onChange={(e) => setInterest(e.target.value)}>
+              <option>ML</option>
+              <option>Web</option>
+              <option>AI</option>
+            </select>
+
+            {/* COMPANY */}
+            <h3>Company Preference</h3>
+            <select onChange={(e) => setSelectedCompany(e.target.value)}>
+              <option>Product</option>
+              <option>Service</option>
+              <option>Startup</option>
+            </select>
+
+            <button onClick={handleFinalSubmit}>
+              Final Submit →
+            </button>
           </>
         )}
 
