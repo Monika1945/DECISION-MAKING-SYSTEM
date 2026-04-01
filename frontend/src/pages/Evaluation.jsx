@@ -1,272 +1,230 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Evaluation = () => {
-  const [theme, setTheme] = useState("light");
-  const [section, setSection] = useState("home");
+
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [company, setCompany] = useState("");
-  const [interest, setInterest] = useState("");
   const [submitted, setSubmitted] = useState(false);
-
-  // 🌗 THEME LOAD
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    }
-  }, []);
-
-  // 🌗 TOGGLE
-  const toggleTheme = () => {
-    const root = document.documentElement;
-    root.classList.toggle("dark");
-
-    const newTheme = root.classList.contains("dark") ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
+  const [timeLeft, setTimeLeft] = useState(180);
 
   // QUESTIONS
-  const data = {
-    aptitude: [
-      {
-        q: "A worker completes a job in 10 days. How many days for 2 workers?",
-        options: ["5", "10", "20", "8"],
-        answer: "5"
-      }
-    ],
-    logical: [
-      {
-        q: "If all cats are animals, some animals are black, then:",
-        options: [
-          "All cats are black",
-          "Some cats may be black",
-          "No cats are black",
-          "All animals are cats"
-        ],
-        answer: "Some cats may be black"
-      }
-    ],
-    verbal: [
-      {
-        q: "Choose correct meaning: 'Efficient system'",
-        options: ["Slow", "Working well", "Broken", "Old"],
-        answer: "Working well"
-      }
-    ]
+  const questions = [
+    {
+      section: "Aptitude",
+      q: "A company produces 120 units/day. Efficiency drops by 25% for 4 days. Total production?",
+      options: ["360", "300", "400", "420"],
+      answer: "360"
+    },
+    {
+      section: "Logical",
+      q: "All engineers are coders. Some coders are designers. Which is true?",
+      options: [
+        "All engineers are designers",
+        "Some engineers may be designers",
+        "No engineers are designers",
+        "All designers are engineers"
+      ],
+      answer: "Some engineers may be designers"
+    },
+    {
+      section: "Verbal",
+      q: "Choose correct meaning: 'She executed the task flawlessly.'",
+      options: [
+        "With errors",
+        "Perfectly",
+        "Slowly",
+        "Carelessly"
+      ],
+      answer: "Perfectly"
+    }
+  ];
+
+  // TIMER
+  useEffect(() => {
+    if (timeLeft > 0 && !submitted) {
+      const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(t);
+    }
+    if (timeLeft === 0) setSubmitted(true);
+  }, [timeLeft, submitted]);
+
+  // SELECT
+  const select = (val) => {
+    setAnswers({ ...answers, [step]: val });
   };
 
-  const currentQ = data[section]?.[step];
+  // RESULT LOGIC
+  const getResult = () => {
+    let correct = 0;
+    let section = { Aptitude: 0, Logical: 0, Verbal: 0 };
 
-  const selectOption = (val) => {
-    setAnswers({ ...answers, [section + step]: val });
-  };
-
-  const next = () => {
-    if (step < data[section].length - 1) setStep(step + 1);
-    else setSection("home");
-  };
-
-  const calculateResult = () => {
-    let score = 0;
-    let total = 0;
-
-    Object.keys(data).forEach(sec => {
-      data[sec].forEach((q, i) => {
-        total++;
-        if (answers[sec + i] === q.answer) score++;
-      });
+    questions.forEach((q, i) => {
+      if (answers[i] === q.answer) {
+        correct++;
+        section[q.section]++;
+      }
     });
 
-    let percent = (score / total) * 100;
+    const percent = (correct / questions.length) * 100;
 
-    let status = "";
-    if (percent >= 75 && company && interest) status = "READY ✅";
-    else if (percent >= 50) status = "ALMOST READY ⚠️";
-    else status = "NOT READY ❌";
+    let status = percent >= 75 ? "READY 🚀" :
+                 percent >= 50 ? "ALMOST READY ⚠️" :
+                 "NOT READY ❌";
 
-    return { score, percent, status };
+    return { correct, percent, status, section };
   };
 
-  // RESULT
+  // RESULT SCREEN
   if (submitted) {
-    const res = calculateResult();
+    const res = getResult();
 
     return (
-      <div style={styles.page}>
-        <Navbar toggleTheme={toggleTheme} />
+      <div className="min-h-screen bg-black text-white p-8">
 
-        <div style={styles.result}>
-          <h1>{res.status}</h1>
-          <p>Score: {res.score}</p>
-          <p>{res.percent.toFixed(1)}%</p>
-          <p>Company: {company}</p>
-          <p>Interest: {interest}</p>
+        <div className="max-w-4xl mx-auto">
 
-          <button onClick={() => window.location.reload()}>
-            Retake Assessment
+          <h1 className="text-4xl font-bold mb-6">🎯 Assessment Result</h1>
+
+          <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8">
+
+            <h2 className="text-5xl font-bold">{res.status}</h2>
+            <p className="mt-2 text-gray-400">
+              Score: {res.correct} / {questions.length} ({res.percent.toFixed(1)}%)
+            </p>
+
+          </div>
+
+          {/* SECTION BREAKDOWN */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+
+            {Object.entries(res.section).map(([sec, val], i) => (
+              <div key={i} className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
+
+                <h3 className="font-bold mb-2">{sec}</h3>
+                <p className="text-3xl">{val}</p>
+
+              </div>
+            ))}
+
+          </div>
+
+          {/* FEEDBACK */}
+          <div className="p-6 bg-white/10 rounded-2xl backdrop-blur-xl">
+
+            <h3 className="font-bold mb-3">Growth Insights 🧠</h3>
+
+            {res.section.Aptitude === 0 && <p>👉 Improve Aptitude problem solving</p>}
+            {res.section.Logical === 0 && <p>👉 Practice logical reasoning</p>}
+            {res.section.Verbal === 0 && <p>👉 Work on communication skills</p>}
+
+          </div>
+
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl"
+          >
+            Back to Dashboard
           </button>
+
         </div>
       </div>
     );
   }
 
-  // TEST SCREEN
-  if (section !== "home") {
-    return (
-      <div style={styles.page}>
-        <Navbar toggleTheme={toggleTheme} />
+  const q = questions[step];
 
-        <div style={styles.card}>
-          <h2>{section.toUpperCase()} Test</h2>
-
-          <p>{currentQ.q}</p>
-
-          {currentQ.options.map(opt => (
-            <button
-              key={opt}
-              onClick={() => selectOption(opt)}
-              style={{
-                ...styles.option,
-                background:
-                  answers[section + step] === opt ? "#2563eb" : "#e5e7eb"
-              }}
-            >
-              {opt}
-            </button>
-          ))}
-
-          <button onClick={next}>Next</button>
-        </div>
-      </div>
-    );
-  }
-
-  // HOME SCREEN
   return (
-    <div style={styles.page}>
-      <Navbar toggleTheme={toggleTheme} />
+    <div className="min-h-screen bg-black text-white">
 
-      <div style={styles.container}>
-        <h1>Placement Assessment</h1>
+      {/* HEADER */}
+      <div className="flex justify-between items-center px-8 py-4 border-b border-white/10 backdrop-blur-xl">
+        <h2 className="text-xl font-bold">Assessment</h2>
+        <span className="text-purple-400">⏱ {timeLeft}s</span>
+      </div>
 
-        {/* Sections */}
-        <div style={styles.grid}>
-          {["aptitude", "logical", "verbal"].map(sec => (
-            <div key={sec} style={styles.box}>
-              <h3>{sec.toUpperCase()}</h3>
-              <button onClick={() => { setSection(sec); setStep(0); }}>
-                Take Test
-              </button>
-            </div>
-          ))}
-        </div>
+      <div className="max-w-4xl mx-auto p-6">
 
-        {/* Preferences */}
-        <div style={styles.pref}>
-          <h3>Company Preference</h3>
-          <select onChange={(e) => setCompany(e.target.value)}>
-            <option>Product</option>
-            <option>Service</option>
-            <option>Startup</option>
-          </select>
-
-          <h3>Interest / Skill</h3>
-          <input
-            placeholder="e.g AI / Web Dev"
-            onChange={(e) => setInterest(e.target.value)}
+        {/* PROGRESS */}
+        <div className="h-2 bg-white/10 rounded-full mb-6">
+          <div
+            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+            style={{ width: `${((step + 1) / questions.length) * 100}%` }}
           />
         </div>
 
-        <button style={styles.submit} onClick={() => setSubmitted(true)}>
-          Get Result
-        </button>
+        {/* QUESTION CARD */}
+        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl">
+
+          <p className="text-sm text-gray-400 mb-2">{q.section}</p>
+
+          <h3 className="text-xl font-semibold mb-4">{q.q}</h3>
+
+          <div className="space-y-3">
+            {q.options.map(opt => (
+              <button
+                key={opt}
+                onClick={() => select(opt)}
+                className={`w-full text-left px-4 py-3 rounded-xl transition 
+                ${answers[step] === opt 
+                  ? "bg-purple-600 text-white" 
+                  : "bg-white/10 hover:bg-white/20"}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+
+          {/* NAV */}
+          <div className="flex justify-between mt-6">
+
+            <button
+              disabled={step === 0}
+              onClick={() => setStep(step - 1)}
+              className="px-4 py-2 bg-white/10 rounded-lg"
+            >
+              Prev
+            </button>
+
+            {step === questions.length - 1 ? (
+              <button
+                onClick={() => setSubmitted(true)}
+                className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl"
+              >
+                Submit 🚀
+              </button>
+            ) : (
+              <button
+                onClick={() => setStep(step + 1)}
+                className="px-4 py-2 bg-white/10 rounded-lg"
+              >
+                Next
+              </button>
+            )}
+
+          </div>
+
+        </div>
+
+        {/* NAVIGATOR */}
+        <div className="flex gap-2 mt-6 flex-wrap">
+          {questions.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setStep(i)}
+              className={`w-10 h-10 rounded-full 
+              ${answers[i] ? "bg-green-500" : "bg-white/10"}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+
       </div>
     </div>
   );
-};
-
-// NAVBAR
-const Navbar = ({ toggleTheme }) => (
-  <div style={styles.nav}>
-    <h2>🚀 MyApp</h2>
-
-    <div>
-      <button onClick={toggleTheme}>🌙</button>
-      <span style={styles.avatar}>M</span>
-    </div>
-  </div>
-);
-
-// STYLES
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "var(--bg)",
-    color: "var(--text)"
-  },
-
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "1rem 2rem",
-    background: "var(--card)"
-  },
-
-  avatar: {
-    marginLeft: "10px",
-    background: "#2563eb",
-    color: "#fff",
-    padding: "8px",
-    borderRadius: "50%"
-  },
-
-  container: {
-    padding: "2rem",
-    textAlign: "center"
-  },
-
-  grid: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "1rem"
-  },
-
-  box: {
-    padding: "1rem",
-    background: "var(--card)",
-    borderRadius: "10px"
-  },
-
-  card: {
-    padding: "2rem",
-    background: "var(--card)",
-    margin: "2rem"
-  },
-
-  option: {
-    display: "block",
-    margin: "10px",
-    padding: "10px"
-  },
-
-  pref: {
-    marginTop: "2rem"
-  },
-
-  submit: {
-    marginTop: "1rem",
-    padding: "10px",
-    background: "#16a34a",
-    color: "#fff"
-  },
-
-  result: {
-    textAlign: "center",
-    marginTop: "3rem"
-  }
 };
 
 export default Evaluation;
