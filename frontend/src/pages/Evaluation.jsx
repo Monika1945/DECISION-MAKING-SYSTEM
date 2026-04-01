@@ -14,31 +14,34 @@ const Evaluation = () => {
   const [scores, setScores] = useState({});
   const [interest, setInterest] = useState("");
   const [company, setCompany] = useState("");
-  const [userInitial, setUserInitial] = useState("U");
 
   const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
 
-  // 🌙 Load Theme + User
+  // 🌙 LOAD THEME
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
       document.documentElement.classList.add("dark");
       setDarkMode(true);
     }
-
-    // 👤 Get email first letter
-    const email = localStorage.getItem("email");
-    if (email) {
-      setUserInitial(email.charAt(0).toUpperCase());
-    }
   }, []);
 
+  // 🌗 TOGGLE THEME
   const toggleTheme = () => {
     const root = document.documentElement;
     root.classList.toggle("dark");
     const isDark = root.classList.contains("dark");
     setDarkMode(isDark);
     localStorage.setItem("theme", isDark ? "dark" : "light");
+  };
+
+  // 👤 GET USER INITIAL
+  const getUserInitial = () => {
+    const email = localStorage.getItem("email");
+    if (email && email.length > 0) {
+      return email[0].toUpperCase();
+    }
+    return "U";
   };
 
   const theme = {
@@ -60,8 +63,101 @@ const Evaluation = () => {
 
   const t = darkMode ? theme.dark : theme.light;
 
-  // 🧠 QUESTION BANK (same as yours)
-  const questionBank = { /* keep your existing */ };
+  // 🧠 QUESTION BANK
+  const questionBank = {
+    Aptitude: [
+      {
+        q: "A company reduces 500 units by 20%. New production?",
+        options: ["400", "420", "450", "380"],
+        ans: "400"
+      },
+      {
+        q: "Delivery travels 60km/hr for 3 hrs. Distance?",
+        options: ["180", "150", "120", "200"],
+        ans: "180"
+      },
+      {
+        q: "Profit ₹200 on ₹800. Profit %?",
+        options: ["25%", "20%", "30%", "40%"],
+        ans: "25%"
+      },
+      {
+        q: "SI on ₹1000 @10% for 2 yrs?",
+        options: ["200", "100", "300", "400"],
+        ans: "200"
+      },
+      {
+        q: "If x=2, x²+2x?",
+        options: ["8", "6", "10", "12"],
+        ans: "8"
+      }
+    ],
+
+    Logical: [
+      {
+        q: "All devs are testers. Some testers managers?",
+        options: [
+          "Some devs may be managers",
+          "All devs managers",
+          "None",
+          "All testers devs"
+        ],
+        ans: "Some devs may be managers"
+      },
+      { q: "2,4,8,16,?", options: ["32", "24", "20", "18"], ans: "32" },
+      {
+        q: "Odd one: Apple, Mango, Carrot",
+        options: ["Carrot", "Apple", "Mango", "None"],
+        ans: "Carrot"
+      },
+      { q: "Mirror LEFT?", options: ["TFEL", "LEFT", "FLET", "None"], ans: "TFEL" },
+      { q: "A>B, B>C?", options: ["A>C", "C>A", "A=B", "None"], ans: "A>C" }
+    ],
+
+    Verbal: [
+      {
+        q: "Seamlessly means?",
+        options: ["Without problems", "Slow", "Bad", "Incomplete"],
+        ans: "Without problems"
+      },
+      {
+        q: "Opposite of Strong?",
+        options: ["Weak", "Hard", "Big", "Solid"],
+        ans: "Weak"
+      },
+      { q: "She ___ going.", options: ["is", "are", "am", "be"], ans: "is" },
+      { q: "Rapid means?", options: ["Fast", "Slow", "Late", "Stop"], ans: "Fast" },
+      { q: "Execute?", options: ["Perform", "Stop", "Cancel", "Break"], ans: "Perform" }
+    ],
+
+    Technical: [
+      {
+        q: "System programming language?",
+        options: ["C", "HTML", "CSS", "SQL"],
+        ans: "C"
+      },
+      {
+        q: "Java is?",
+        options: ["OOP", "Procedural", "Markup", "Functional"],
+        ans: "OOP"
+      },
+      {
+        q: "OS manages?",
+        options: ["Hardware", "Memory", "Process", "All"],
+        ans: "All"
+      },
+      {
+        q: "TCP layer?",
+        options: ["Transport", "Network", "DL", "Physical"],
+        ans: "Transport"
+      },
+      {
+        q: "RAM?",
+        options: ["Temporary", "Permanent", "External", "None"],
+        ans: "Temporary"
+      }
+    ]
+  };
 
   const startTest = (section) => {
     setActiveSection(section);
@@ -92,7 +188,7 @@ const Evaluation = () => {
   return (
     <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
 
-      {/* NAVBAR */}
+      {/* 🔝 NAVBAR */}
       <nav style={{
         display: "flex",
         justifyContent: "space-between",
@@ -103,24 +199,23 @@ const Evaluation = () => {
 
         <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
           
-          {/* 🌙 THEME */}
           <button onClick={toggleTheme}>
             {darkMode ? "🌞" : "🌙"}
           </button>
 
           {/* 👤 AVATAR */}
           <div style={{
-            width: "38px",
-            height: "38px",
+            width: "40px",
+            height: "40px",
             borderRadius: "50%",
-            background: t.primary,
+            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: "#fff",
-            fontWeight: "bold"
+            fontWeight: "700"
           }}>
-            {userInitial}
+            {getUserInitial()}
           </div>
 
           <SidebarMenu color={t.text} />
@@ -170,8 +265,8 @@ const Evaluation = () => {
                 background: "green",
                 color: "#fff",
                 padding: "12px",
-                borderRadius: "8px",
-                width: "100%"
+                width: "100%",
+                borderRadius: "8px"
               }}
             >
               Submit Section ✅
@@ -209,7 +304,7 @@ const Evaluation = () => {
               </div>
             ))}
 
-            {/* 🔥 INTEREST FIXED */}
+            {/* INPUT FIXED */}
             <input
               placeholder="Enter your interest"
               value={interest}
@@ -225,7 +320,6 @@ const Evaluation = () => {
               }}
             />
 
-            {/* 🔥 COMPANY FIXED */}
             <select
               value={company}
               onChange={(e) => setCompany(e.target.value)}
@@ -239,7 +333,7 @@ const Evaluation = () => {
                 color: t.text
               }}
             >
-              <option value="">Select Company Type</option>
+              <option value="">Select Company</option>
               <option>Product</option>
               <option>Service</option>
               <option>Startup</option>
