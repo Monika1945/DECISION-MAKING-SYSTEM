@@ -6,8 +6,9 @@ const evaluationSchema = new mongoose.Schema({
     aptitudeScore: { type: Number, required: true },
     communicationScore: { type: Number, required: true },
     logicalScore: { type: Number, required: true },
-    leadershipScore: { type: Number, required: true },
+    leadershipScore: { type: Number, default: 0 },
     totalScore: { type: Number, required: true },
+    maxScore: { type: Number, required: true },
     technicalSkills: [{
         skill: { type: String },
         rating: { type: Number }

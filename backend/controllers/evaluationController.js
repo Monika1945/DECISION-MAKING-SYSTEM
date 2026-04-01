@@ -1,34 +1,62 @@
 const Evaluation = require('../models/Evaluation');
-const User = require('../models/User');
 
 exports.evaluate = async (req, res) => {
     try {
-        const { technicalScore, aptitudeScore, communicationScore, logicalScore, leadershipScore, technicalSkills, companyPreference, interestedSkill } = req.body;
+        const {
+            technicalScore,
+            aptitudeScore,
+            communicationScore,
+            logicalScore,
+            leadershipScore,
+            technicalSkills,
+            companyPreference,
+            interestedSkill
+        } = req.body;
         const userId = req.user.userId;
 
-        const totalScore = technicalScore + aptitudeScore + communicationScore + logicalScore + leadershipScore;
+        const normalizedScores = {
+            technicalScore: Number(technicalScore) || 0,
+            aptitudeScore: Number(aptitudeScore) || 0,
+            communicationScore: Number(communicationScore) || 0,
+            logicalScore: Number(logicalScore) || 0,
+            leadershipScore: leadershipScore === undefined ? undefined : Number(leadershipScore) || 0
+        };
+
+        const activeScores = Object.values(normalizedScores).filter((value) => value !== undefined);
+        const totalScore = activeScores.reduce((sum, value) => sum + value, 0);
+        const maxScore = activeScores.length * 5;
+        const percentage = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
         let status = 'Not Ready';
         let recommendations = [];
 
-        // Updated logic for Total 150
-        if (totalScore >= 120) {
+        if (percentage >= 75) {
             status = 'Ready';
-            recommendations.push('Excellent! You are fully prepared for high-tier placements.');
-        } else if (totalScore >= 75) {
+            recommendations.push('Excellent progress. You are performing well across the recent assessment.');
+        } else if (percentage >= 50) {
             status = 'Nearly Ready';
-            if (technicalScore < 35) recommendations.push('Focus more on technical depth.');
-            if (logicalScore < 20) recommendations.push('Practice advanced logical reasoning.');
-            if (leadershipScore < 12) recommendations.push('Participate in team projects to build leadership.');
+            if (normalizedScores.technicalScore < 3) recommendations.push('Focus more on technical depth and problem solving.');
+            if (normalizedScores.logicalScore < 3) recommendations.push('Practice logical reasoning and timed problem sets.');
+            if (normalizedScores.communicationScore < 3) recommendations.push('Work on verbal clarity, mock interviews, and communication drills.');
+            if (normalizedScores.aptitudeScore < 3) recommendations.push('Strengthen aptitude fundamentals with regular practice.');
+            if (normalizedScores.leadershipScore !== undefined && normalizedScores.leadershipScore < 3) {
+                recommendations.push('Participate in team projects to build leadership confidence.');
+            }
         } else {
             status = 'Not Ready';
             recommendations.push('Comprehensive preparation is required across all modules.');
         }
 
-        // Add tailored recommendations based on preference
-        if (companyPreference === 'Product Based') {
+        const normalizedCompanyPreference =
+            companyPreference === 'Product' ? 'Product Based'
+            : companyPreference === 'Service' ? 'Service Based'
+            : companyPreference;
+
+        if (normalizedCompanyPreference === 'Product Based') {
             recommendations.push('For product-based companies, master Data Structures and Algorithms (DSA).');
-        } else if (companyPreference === 'Service Based') {
+        } else if (normalizedCompanyPreference === 'Service Based') {
             recommendations.push('For service-based companies, focus on aptitude and core CS fundamentals.');
+        } else if (normalizedCompanyPreference === 'Startup') {
+            recommendations.push('For startups, highlight adaptability, practical projects, and problem ownership.');
         }
 
         if (interestedSkill) {
@@ -37,16 +65,17 @@ exports.evaluate = async (req, res) => {
 
         const evaluation = new Evaluation({
             userId,
-            technicalScore,
-            aptitudeScore,
-            communicationScore,
-            logicalScore,
-            leadershipScore,
+            technicalScore: normalizedScores.technicalScore,
+            aptitudeScore: normalizedScores.aptitudeScore,
+            communicationScore: normalizedScores.communicationScore,
+            logicalScore: normalizedScores.logicalScore,
+            leadershipScore: normalizedScores.leadershipScore ?? 0,
             totalScore,
+            maxScore,
             technicalSkills,
             status,
             recommendations,
-            companyPreference,
+            companyPreference: normalizedCompanyPreference,
             interestedSkill
         });
 

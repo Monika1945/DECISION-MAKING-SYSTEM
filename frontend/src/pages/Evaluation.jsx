@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import SidebarMenu from "../components/SidebarMenu";
 import ProjectLogo from "../components/Logo";
 import { useNavigate } from "react-router-dom";
+import API_BASE from "../config";
 
 const Evaluation = () => {
   const navigate = useNavigate();
@@ -14,10 +16,10 @@ const Evaluation = () => {
   const [scores, setScores] = useState({});
   const [interest, setInterest] = useState("");
   const [company, setCompany] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
 
-  // 🌙 LOAD THEME
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -26,7 +28,6 @@ const Evaluation = () => {
     }
   }, []);
 
-  // 🌗 TOGGLE THEME
   const toggleTheme = () => {
     const root = document.documentElement;
     root.classList.toggle("dark");
@@ -35,7 +36,6 @@ const Evaluation = () => {
     localStorage.setItem("theme", isDark ? "dark" : "light");
   };
 
-  // 👤 GET USER INITIAL
   const getUserInitial = () => {
     const email = localStorage.getItem("email");
     if (email && email.length > 0) {
@@ -63,7 +63,6 @@ const Evaluation = () => {
 
   const t = darkMode ? theme.dark : theme.light;
 
-  // 🧠 QUESTION BANK
   const questionBank = {
     Aptitude: [
       {
@@ -77,22 +76,21 @@ const Evaluation = () => {
         ans: "180"
       },
       {
-        q: "Profit ₹200 on ₹800. Profit %?",
+        q: "Profit Rs200 on Rs800. Profit %?",
         options: ["25%", "20%", "30%", "40%"],
         ans: "25%"
       },
       {
-        q: "SI on ₹1000 @10% for 2 yrs?",
+        q: "SI on Rs1000 @10% for 2 yrs?",
         options: ["200", "100", "300", "400"],
         ans: "200"
       },
       {
-        q: "If x=2, x²+2x?",
+        q: "If x=2, x^2+2x?",
         options: ["8", "6", "10", "12"],
         ans: "8"
       }
     ],
-
     Logical: [
       {
         q: "All devs are testers. Some testers managers?",
@@ -113,7 +111,6 @@ const Evaluation = () => {
       { q: "Mirror LEFT?", options: ["TFEL", "LEFT", "FLET", "None"], ans: "TFEL" },
       { q: "A>B, B>C?", options: ["A>C", "C>A", "A=B", "None"], ans: "A>C" }
     ],
-
     Verbal: [
       {
         q: "Seamlessly means?",
@@ -129,7 +126,6 @@ const Evaluation = () => {
       { q: "Rapid means?", options: ["Fast", "Slow", "Late", "Stop"], ans: "Fast" },
       { q: "Execute?", options: ["Perform", "Stop", "Cancel", "Break"], ans: "Perform" }
     ],
-
     Technical: [
       {
         q: "System programming language?",
@@ -171,50 +167,84 @@ const Evaluation = () => {
       if (answers[i] === q.ans) score++;
     });
 
-    setScores(prev => ({ ...prev, [activeSection]: score }));
-    setCompleted(prev => ({ ...prev, [activeSection]: true }));
+    setScores((prev) => ({ ...prev, [activeSection]: score }));
+    setCompleted((prev) => ({ ...prev, [activeSection]: true }));
     setActiveSection(null);
   };
 
-  const finalSubmit = () => {
-    const total = Object.values(scores).reduce((a, b) => a + b, 0);
-    const percent = (total / 20) * 100;
+  const finalSubmit = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
-    navigate("/result", {
-      state: { scores, total, percent, interest, company }
-    });
+    if (sections.some((section) => !completed[section])) {
+      alert("Please complete all sections before final submit.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const payload = {
+        aptitudeScore: scores.Aptitude || 0,
+        logicalScore: scores.Logical || 0,
+        communicationScore: scores.Verbal || 0,
+        technicalScore: scores.Technical || 0,
+        companyPreference: company,
+        interestedSkill: interest,
+        technicalSkills: []
+      };
+
+      const res = await axios.post(`${API_BASE}/api/evaluation`, payload, {
+        headers: { "x-auth-token": token }
+      });
+
+      navigate(`/result?id=${res.data._id}`, {
+        state: { evaluation: res.data }
+      });
+    } catch (err) {
+      console.error("Evaluation submit error:", err);
+      const errorMsg =
+        err.response?.data?.msg ||
+        (err.request ? "Cannot reach backend. Make sure backend is running on port 5000." : "Failed to save evaluation.");
+      alert(errorMsg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
-
-      {/* 🔝 NAVBAR */}
-      <nav style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "1rem 2rem",
-        borderBottom: `1px solid ${t.border}`
-      }}>
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "1rem 2rem",
+          borderBottom: `1px solid ${t.border}`
+        }}
+      >
         <ProjectLogo />
 
         <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          
           <button onClick={toggleTheme}>
-            {darkMode ? "🌞" : "🌙"}
+            {darkMode ? "Dark" : "Light"}
           </button>
 
-          {/* 👤 AVATAR */}
-          <div style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#fff",
-            fontWeight: "700"
-          }}>
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontWeight: "700"
+            }}
+          >
             {getUserInitial()}
           </div>
 
@@ -223,22 +253,23 @@ const Evaluation = () => {
       </nav>
 
       <div style={{ maxWidth: "900px", margin: "auto", padding: "2rem" }}>
-
-        {/* QUESTIONS */}
         {activeSection && (
           <>
             <h2>{activeSection} Test</h2>
 
             {questions.map((q, i) => (
-              <div key={i} style={{
-                margin: "1rem 0",
-                padding: "1rem",
-                background: t.card,
-                borderRadius: "10px"
-              }}>
+              <div
+                key={i}
+                style={{
+                  margin: "1rem 0",
+                  padding: "1rem",
+                  background: t.card,
+                  borderRadius: "10px"
+                }}
+              >
                 <p>{q.q}</p>
 
-                {q.options.map(opt => (
+                {q.options.map((opt) => (
                   <button
                     key={opt}
                     onClick={() => setAnswers({ ...answers, [i]: opt })}
@@ -269,25 +300,27 @@ const Evaluation = () => {
                 borderRadius: "8px"
               }}
             >
-              Submit Section ✅
+              Submit Section
             </button>
           </>
         )}
 
-        {/* MAIN */}
         {!activeSection && (
           <>
             <h1>Assessment</h1>
 
-            {sections.map(sec => (
-              <div key={sec} style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "15px",
-                background: t.card,
-                margin: "10px 0",
-                borderRadius: "10px"
-              }}>
+            {sections.map((sec) => (
+              <div
+                key={sec}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "15px",
+                  background: t.card,
+                  margin: "10px 0",
+                  borderRadius: "10px"
+                }}
+              >
                 <h3>{sec}</h3>
 
                 <button
@@ -304,7 +337,6 @@ const Evaluation = () => {
               </div>
             ))}
 
-            {/* INPUT FIXED */}
             <input
               placeholder="Enter your interest"
               value={interest}
@@ -341,16 +373,19 @@ const Evaluation = () => {
 
             <button
               onClick={finalSubmit}
+              disabled={submitting}
               style={{
                 marginTop: "20px",
                 width: "100%",
                 background: t.primary,
                 color: "#fff",
                 padding: "12px",
-                borderRadius: "10px"
+                borderRadius: "10px",
+                opacity: submitting ? 0.7 : 1,
+                cursor: submitting ? "not-allowed" : "pointer"
               }}
             >
-              Final Submit →
+              {submitting ? "Saving..." : "Final Submit ->"}
             </button>
           </>
         )}
