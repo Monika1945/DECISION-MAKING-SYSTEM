@@ -6,7 +6,7 @@ import ProjectLogo from '../components/Logo';
 
 const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
-const Dashboard = () => {
+const Dashboard = () => { 
     const [user, setUser] = useState(null);
     const [latestEval, setLatestEval] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -55,6 +55,16 @@ const Dashboard = () => {
     const theme = darkMode
         ? "bg-black text-white"
         : "bg-gradient-to-br from-slate-50 to-blue-100 text-gray-900";
+
+    // ✅ TOTAL SCORE (OUT OF 20)
+    const totalScore = latestEval
+        ? (latestEval.aptitudeScore || 0) +
+          (latestEval.logicalScore || 0) +
+          (latestEval.communicationScore || 0) +
+          (latestEval.technicalScore || 0)
+        : 0;
+
+    const percent = (totalScore / 20) * 100;
 
     return (
         <div className={`min-h-screen ${theme} transition-all duration-500`}>
@@ -124,11 +134,15 @@ const Dashboard = () => {
                                     </p>
 
                                     <h2 className="text-5xl font-bold">
-                                        {latestEval.totalScore} / 150
+                                        {totalScore} / 20
                                     </h2>
 
                                     <p className="mt-2 text-green-400">
-                                        {latestEval.status} ✅
+                                        {latestEval.status}
+                                    </p>
+
+                                    <p className="text-gray-400 mt-1">
+                                        {percent.toFixed(1)}%
                                     </p>
                                 </div>
 
@@ -142,7 +156,7 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        {/* PERFORMANCE */}
+                        {/* ✅ UPDATED PERFORMANCE ONLY */}
                         <div className="mb-8">
                             <h3 className="text-xl font-bold mb-2">Performance Breakdown 📊</h3>
                             <p className="text-gray-400 mb-6">
@@ -152,24 +166,21 @@ const Dashboard = () => {
                             <div className="grid md:grid-cols-2 gap-6">
 
                                 {[
-                                    { label: 'Technical', score: latestEval.technicalScore, max: 50 },
-                                    { label: 'Aptitude', score: latestEval.aptitudeScore, max: 30 },
-                                    { label: 'Communication', score: latestEval.communicationScore, max: 30 },
-                                    { label: 'Logical', score: latestEval.logicalScore, max: 25 },
-                                    { label: 'Leadership', score: latestEval.leadershipScore, max: 15 },
+                                    { label: 'Aptitude', score: latestEval.aptitudeScore || 0, max: 5 },
+                                    { label: 'Logical', score: latestEval.logicalScore || 0, max: 5 },
+                                    { label: 'Verbal', score: latestEval.communicationScore || 0, max: 5 },
+                                    { label: 'Technical', score: latestEval.technicalScore || 0, max: 5 },
                                 ].map((item, i) => {
 
-                                    // ✅ FIXED LOGIC
-                                    const rawPercentage = Math.round((item.score / item.max) * 100);
-                                    const percentage = Math.min(rawPercentage, 100);
+                                    const percentage = Math.round((item.score / item.max) * 100);
 
                                     let status = "";
                                     let color = "";
 
-                                    if (rawPercentage >= 75) {
+                                    if (percentage >= 75) {
                                         status = "Strong 💪";
                                         color = "text-green-400";
-                                    } else if (rawPercentage >= 50) {
+                                    } else if (percentage >= 50) {
                                         status = "Average 👍";
                                         color = "text-yellow-400";
                                     } else {
@@ -193,7 +204,6 @@ const Dashboard = () => {
                                                 {item.score} / {item.max}
                                             </p>
 
-                                            {/* ✅ FIXED BAR */}
                                             <div className="h-2 bg-white/10 rounded-full mb-2 overflow-hidden">
                                                 <div
                                                     className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
@@ -202,7 +212,7 @@ const Dashboard = () => {
                                             </div>
 
                                             <p className="text-xs text-gray-400">
-                                                {rawPercentage}% completed
+                                                {percentage}% completed
                                             </p>
                                         </div>
                                     );
