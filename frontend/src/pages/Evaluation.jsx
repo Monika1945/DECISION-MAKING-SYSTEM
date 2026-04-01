@@ -4,8 +4,11 @@ import ProjectLogo from "../components/Logo";
 
 const Evaluation = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState({});
 
-  // 🌙 Load saved theme
+  // 🌙 Load theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -14,205 +17,242 @@ const Evaluation = () => {
     }
   }, []);
 
-  // 🌗 Toggle theme
   const toggleTheme = () => {
     const root = document.documentElement;
     root.classList.toggle("dark");
-
     const isDark = root.classList.contains("dark");
     setDarkMode(isDark);
-
     localStorage.setItem("theme", isDark ? "dark" : "light");
   };
 
   const theme = {
     light: {
-      bg: "linear-gradient(135deg,#f8fafc,#eef2ff)",
-      card: "rgba(255,255,255,0.7)",
+      bg: "#f8fafc",
+      card: "#ffffff",
       text: "#0f172a",
       sub: "#64748b",
-      border: "#e2e8f0",
       primary: "#4f46e5"
     },
     dark: {
-      bg: "linear-gradient(135deg,#020617,#0f172a)",
-      card: "rgba(30,41,59,0.6)",
+      bg: "#020617",
+      card: "#1e293b",
       text: "#f1f5f9",
       sub: "#94a3b8",
-      border: "#334155",
       primary: "#6366f1"
     }
   };
 
   const t = darkMode ? theme.dark : theme.light;
 
-  const sections = [
-    {
-      title: "Aptitude",
-      desc: "Problem solving, speed & accuracy"
-    },
-    {
-      title: "Logical",
-      desc: "Reasoning and thinking ability"
-    },
-    {
-      title: "Verbal",
-      desc: "English and communication skills"
-    },
-    {
-      title: "Analytical Thinking",
-      desc: "Decision making and problem solving"
-    },
-    {
-      title: "Technical",
-      desc: "C, Java, OS, Computer Networks"
-    },
-    {
-      title: "Interest",
-      desc: "ML, Web Development, AI"
-    },
-    {
-      title: "Company Preference",
-      desc: "Product, Service, Startup"
-    }
-  ];
+  // 🎯 QUESTION BANK (SCENARIO BASED)
+  const questionBank = {
+    Aptitude: [
+      {
+        q: "A company reduces cost by 20%. Original cost = 500. New cost?",
+        options: ["400", "450", "420", "380"]
+      },
+      {
+        q: "Production doubles every day. Day1=5 units. Day3?",
+        options: ["20", "15", "10", "25"]
+      },
+      {
+        q: "A train travels 60km in 1 hour. Distance in 3 hours?",
+        options: ["180", "120", "200", "150"]
+      },
+      {
+        q: "Profit = 200, cost = 800. Profit %?",
+        options: ["25%", "20%", "30%", "40%"]
+      },
+      {
+        q: "Simple interest on 1000 at 10% for 2 years?",
+        options: ["200", "100", "300", "400"]
+      }
+    ],
+
+    Logical: [
+      {
+        q: "All cats are animals. Some animals are black. Conclusion?",
+        options: [
+          "All cats are black",
+          "Some cats may be black",
+          "No cats are black",
+          "All animals are cats"
+        ]
+      },
+      {
+        q: "If A>B and B>C, then?",
+        options: ["A>C", "C>A", "A=B", "None"]
+      },
+      {
+        q: "Odd one out: Apple, Mango, Carrot, Banana",
+        options: ["Carrot", "Apple", "Mango", "Banana"]
+      },
+      {
+        q: "Find next: 2,4,8,16,...",
+        options: ["32", "24", "20", "18"]
+      },
+      {
+        q: "Mirror of LEFT?",
+        options: ["TFEL", "LEFT", "EF TL", "None"]
+      }
+    ],
+
+    Verbal: [
+      {
+        q: "‘Efficient’ means?",
+        options: ["Productive", "Lazy", "Slow", "Weak"]
+      },
+      {
+        q: "Synonym of ‘Rapid’?",
+        options: ["Fast", "Slow", "Late", "Stop"]
+      },
+      {
+        q: "Correct sentence?",
+        options: [
+          "She go to school",
+          "She goes to school",
+          "She going school",
+          "She gone school"
+        ]
+      },
+      {
+        q: "Opposite of ‘Strong’?",
+        options: ["Weak", "Hard", "Solid", "Big"]
+      },
+      {
+        q: "‘Execute’ means?",
+        options: ["Perform", "Stop", "Break", "Cancel"]
+      }
+    ],
+
+    Technical: [
+      {
+        q: "C language is?",
+        options: ["Procedural", "Object oriented", "Scripting", "Markup"]
+      },
+      {
+        q: "OS manages?",
+        options: ["Hardware", "Programs", "Memory", "All"]
+      },
+      {
+        q: "TCP belongs to?",
+        options: ["Transport", "Network", "Data Link", "Physical"]
+      },
+      {
+        q: "Java is?",
+        options: ["OOP", "Procedural", "Functional", "None"]
+      },
+      {
+        q: "RAM is?",
+        options: ["Temporary", "Permanent", "External", "None"]
+      }
+    ]
+  };
+
+  // 🎲 RANDOM QUESTIONS
+  const getRandomQuestions = (section) => {
+    const shuffled = [...questionBank[section]].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 5); // show 5 random
+  };
+
+  // ▶️ START TEST
+  const startTest = (section) => {
+    setActiveSection(section);
+    setQuestions(getRandomQuestions(section));
+    setAnswers({});
+  };
+
+  // ❌ BACK
+  const goBack = () => {
+    setActiveSection(null);
+  };
+
+  // ANSWER SELECT
+  const selectAnswer = (index, value) => {
+    setAnswers({ ...answers, [index]: value });
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: t.bg,
-        color: t.text,
-        transition: "0.4s"
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
+
       {/* 🔝 NAVBAR */}
-      <nav
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "1rem 2rem",
-          backdropFilter: "blur(20px)",
-          borderBottom: `1px solid ${t.border}`,
-          position: "sticky",
-          top: 0,
-          zIndex: 10
-        }}
-      >
+      <nav style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "1rem 2rem",
+        borderBottom: "1px solid #ccc"
+      }}>
         <ProjectLogo />
 
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          {/* 🌙 THEME */}
-          <button
-            onClick={toggleTheme}
-            style={{
-              padding: "8px 14px",
-              borderRadius: "20px",
-              border: "none",
-              background: t.primary,
-              color: "white",
-              cursor: "pointer"
-            }}
-          >
-            {darkMode ? "🌞 Light" : "🌙 Dark"}
+        <div style={{ display: "flex", gap: "15px" }}>
+          <button onClick={toggleTheme}>
+            {darkMode ? "🌞" : "🌙"}
           </button>
-
-          {/* 👤 AVATAR */}
-          <div
-            style={{
-              width: "38px",
-              height: "38px",
-              borderRadius: "50%",
-              background: t.primary,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#fff",
-              fontWeight: "bold"
-            }}
-          >
-            M
-          </div>
-
-          {/* ☰ MENU */}
           <SidebarMenu color={t.text} />
         </div>
       </nav>
 
-      {/* 📦 CONTENT */}
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "auto",
-          padding: "3rem 1.5rem"
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "3rem",
-            fontWeight: "900",
-            marginBottom: "2rem"
-          }}
-        >
-          Assessment
-        </h1>
+      <div style={{ maxWidth: "800px", margin: "auto", padding: "2rem" }}>
 
-        {/* 🔥 BOXES */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {sections.map((sec, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "20px 25px",
-                borderRadius: "18px",
+        {/* 🧠 QUESTION SCREEN */}
+        {activeSection ? (
+          <>
+            <button onClick={goBack}>⬅ Back</button>
+
+            <h2>{activeSection} Test</h2>
+
+            {questions.map((q, i) => (
+              <div key={i} style={{
+                margin: "1rem 0",
+                padding: "1rem",
                 background: t.card,
-                backdropFilter: "blur(20px)",
-                border: `1px solid ${t.border}`,
-                transition: "0.3s"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow =
-                  "0 20px 40px rgba(0,0,0,0.25)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "none";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              {/* LEFT */}
-              <div>
-                <h3
-                  style={{
-                    fontSize: "1.4rem",
-                    fontWeight: "800"
-                  }}
-                >
-                  {sec.title}
-                </h3>
-                <p style={{ color: t.sub }}>{sec.desc}</p>
-              </div>
+                borderRadius: "10px"
+              }}>
+                <p>{q.q}</p>
 
-              {/* RIGHT BUTTON */}
-              <button
-                style={{
-                  background: "#000",
-                  color: "#fff",
-                  padding: "10px 18px",
-                  borderRadius: "10px",
-                  border: "none",
-                  cursor: "pointer",
-                  fontWeight: "600"
-                }}
-              >
-                Take Assessment →
-              </button>
-            </div>
-          ))}
-        </div>
+                {q.options.map(opt => (
+                  <button
+                    key={opt}
+                    onClick={() => selectAnswer(i, opt)}
+                    style={{
+                      display: "block",
+                      margin: "5px 0",
+                      background: answers[i] === opt ? t.primary : "#ddd",
+                      color: answers[i] === opt ? "#fff" : "#000",
+                      padding: "6px",
+                      borderRadius: "6px",
+                      border: "none"
+                    }}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <h1>Assessment</h1>
+
+            {Object.keys(questionBank).map((sec) => (
+              <div key={sec} style={{
+                padding: "20px",
+                marginBottom: "15px",
+                background: t.card,
+                borderRadius: "12px",
+                display: "flex",
+                justifyContent: "space-between"
+              }}>
+                <h3>{sec}</h3>
+
+                <button onClick={() => startTest(sec)}>
+                  Take Assessment →
+                </button>
+              </div>
+            ))}
+          </>
+        )}
+
       </div>
     </div>
   );
