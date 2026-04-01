@@ -1,223 +1,271 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Evaluation = () => {
-
+  const [theme, setTheme] = useState("light");
+  const [section, setSection] = useState("home");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [company, setCompany] = useState("");
+  const [interest, setInterest] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  // SCENARIO BASED QUESTIONS
-  const questions = [
-    {
-      section: "Aptitude",
-      q: "A company produces 120 units per day. Due to maintenance, production decreases by 20% for 3 days. What is total production for these 3 days?",
-      options: ["288", "300", "320", "360"],
-      answer: "288"
-    },
-    {
-      section: "Logical",
-      q: "All developers are testers. Some testers are managers. Which statement is true?",
-      options: [
-        "All developers are managers",
-        "Some developers may be managers",
-        "No developer is a manager",
-        "All managers are developers"
-      ],
-      answer: "Some developers may be managers"
-    },
-    {
-      section: "Verbal",
-      q: "Choose the correct meaning: 'The project was executed seamlessly.'",
-      options: [
-        "With difficulty",
-        "Without problems",
-        "Very slowly",
-        "Incomplete"
-      ],
-      answer: "Without problems"
+  // 🌗 THEME LOAD
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
     }
-  ];
+  }, []);
 
-  // HANDLE ANSWER
-  const selectOption = (value) => {
-    setAnswers({ ...answers, [step]: value });
+  // 🌗 TOGGLE
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    root.classList.toggle("dark");
+
+    const newTheme = root.classList.contains("dark") ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
-  // NEXT QUESTION
+  // QUESTIONS
+  const data = {
+    aptitude: [
+      {
+        q: "A worker completes a job in 10 days. How many days for 2 workers?",
+        options: ["5", "10", "20", "8"],
+        answer: "5"
+      }
+    ],
+    logical: [
+      {
+        q: "If all cats are animals, some animals are black, then:",
+        options: [
+          "All cats are black",
+          "Some cats may be black",
+          "No cats are black",
+          "All animals are cats"
+        ],
+        answer: "Some cats may be black"
+      }
+    ],
+    verbal: [
+      {
+        q: "Choose correct meaning: 'Efficient system'",
+        options: ["Slow", "Working well", "Broken", "Old"],
+        answer: "Working well"
+      }
+    ]
+  };
+
+  const currentQ = data[section]?.[step];
+
+  const selectOption = (val) => {
+    setAnswers({ ...answers, [section + step]: val });
+  };
+
   const next = () => {
-    if (step < questions.length - 1) setStep(step + 1);
+    if (step < data[section].length - 1) setStep(step + 1);
+    else setSection("home");
   };
 
-  // PREV QUESTION
-  const prev = () => {
-    if (step > 0) setStep(step - 1);
-  };
-
-  // SUBMIT
-  const handleSubmit = () => {
-    setSubmitted(true);
-  };
-
-  // CALCULATE RESULT
-  const getResult = () => {
+  const calculateResult = () => {
     let score = 0;
+    let total = 0;
 
-    questions.forEach((q, i) => {
-      if (answers[i] === q.answer) score++;
+    Object.keys(data).forEach(sec => {
+      data[sec].forEach((q, i) => {
+        total++;
+        if (answers[sec + i] === q.answer) score++;
+      });
     });
 
-    const percent = (score / questions.length) * 100;
+    let percent = (score / total) * 100;
 
     let status = "";
-    if (percent >= 75) status = "READY ✅";
+    if (percent >= 75 && company && interest) status = "READY ✅";
     else if (percent >= 50) status = "ALMOST READY ⚠️";
     else status = "NOT READY ❌";
 
     return { score, percent, status };
   };
 
-  // RESULT SCREEN
+  // RESULT
   if (submitted) {
-    const res = getResult();
+    const res = calculateResult();
 
     return (
       <div style={styles.page}>
-        <div style={styles.resultCard}>
-          <h1>🎯 Evaluation Result</h1>
+        <Navbar toggleTheme={toggleTheme} />
 
-          <h2>{res.status}</h2>
-          <p>Score: {res.score} / {questions.length}</p>
-          <p>Percentage: {res.percent.toFixed(1)}%</p>
+        <div style={styles.result}>
+          <h1>{res.status}</h1>
+          <p>Score: {res.score}</p>
+          <p>{res.percent.toFixed(1)}%</p>
+          <p>Company: {company}</p>
+          <p>Interest: {interest}</p>
 
-          <button onClick={() => window.location.reload()} style={styles.btn}>
-            Retake Test
+          <button onClick={() => window.location.reload()}>
+            Retake Assessment
           </button>
         </div>
       </div>
     );
   }
 
-  const current = questions[step];
+  // TEST SCREEN
+  if (section !== "home") {
+    return (
+      <div style={styles.page}>
+        <Navbar toggleTheme={toggleTheme} />
 
-  return (
-    <div style={styles.page}>
+        <div style={styles.card}>
+          <h2>{section.toUpperCase()} Test</h2>
 
-      <div style={styles.card}>
+          <p>{currentQ.q}</p>
 
-        <h3>{current.section} Assessment</h3>
-
-        <div style={styles.progress}>
-          Question {step + 1} / {questions.length}
-        </div>
-
-        <p style={styles.question}>{current.q}</p>
-
-        <div style={styles.options}>
-          {current.options.map(opt => (
+          {currentQ.options.map(opt => (
             <button
               key={opt}
               onClick={() => selectOption(opt)}
               style={{
-                ...styles.optionBtn,
-                background: answers[step] === opt ? "#2563eb" : "#f1f5f9",
-                color: answers[step] === opt ? "#fff" : "#111"
+                ...styles.option,
+                background:
+                  answers[section + step] === opt ? "#2563eb" : "#e5e7eb"
               }}
             >
               {opt}
             </button>
           ))}
+
+          <button onClick={next}>Next</button>
         </div>
-
-        <div style={styles.nav}>
-          <button onClick={prev} disabled={step === 0}>Prev</button>
-
-          {step === questions.length - 1 ? (
-            <button onClick={handleSubmit} style={styles.submit}>
-              Submit Test
-            </button>
-          ) : (
-            <button onClick={next}>Next</button>
-          )}
-        </div>
-
       </div>
+    );
+  }
 
+  // HOME SCREEN
+  return (
+    <div style={styles.page}>
+      <Navbar toggleTheme={toggleTheme} />
+
+      <div style={styles.container}>
+        <h1>Placement Assessment</h1>
+
+        {/* Sections */}
+        <div style={styles.grid}>
+          {["aptitude", "logical", "verbal"].map(sec => (
+            <div key={sec} style={styles.box}>
+              <h3>{sec.toUpperCase()}</h3>
+              <button onClick={() => { setSection(sec); setStep(0); }}>
+                Take Test
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Preferences */}
+        <div style={styles.pref}>
+          <h3>Company Preference</h3>
+          <select onChange={(e) => setCompany(e.target.value)}>
+            <option>Product</option>
+            <option>Service</option>
+            <option>Startup</option>
+          </select>
+
+          <h3>Interest / Skill</h3>
+          <input
+            placeholder="e.g AI / Web Dev"
+            onChange={(e) => setInterest(e.target.value)}
+          />
+        </div>
+
+        <button style={styles.submit} onClick={() => setSubmitted(true)}>
+          Get Result
+        </button>
+      </div>
     </div>
   );
 };
 
+// NAVBAR
+const Navbar = ({ toggleTheme }) => (
+  <div style={styles.nav}>
+    <h2>🚀 MyApp</h2>
+
+    <div>
+      <button onClick={toggleTheme}>🌙</button>
+      <span style={styles.avatar}>M</span>
+    </div>
+  </div>
+);
+
+// STYLES
 const styles = {
   page: {
     minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f8fafc",
-    fontFamily: "Inter"
-  },
-
-  card: {
-    background: "#fff",
-    padding: "2rem",
-    borderRadius: "1.5rem",
-    width: "500px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
-  },
-
-  question: {
-    marginTop: "1rem",
-    fontSize: "1.1rem",
-    fontWeight: "600"
-  },
-
-  options: {
-    marginTop: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem"
-  },
-
-  optionBtn: {
-    padding: "0.75rem",
-    borderRadius: "0.5rem",
-    border: "none",
-    cursor: "pointer"
+    background: "var(--bg)",
+    color: "var(--text)"
   },
 
   nav: {
-    marginTop: "1.5rem",
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    padding: "1rem 2rem",
+    background: "var(--card)"
   },
 
-  submit: {
-    background: "#16a34a",
+  avatar: {
+    marginLeft: "10px",
+    background: "#2563eb",
     color: "#fff",
-    padding: "0.5rem 1rem",
-    border: "none",
-    borderRadius: "0.5rem"
+    padding: "8px",
+    borderRadius: "50%"
   },
 
-  resultCard: {
-    background: "#111",
-    color: "#fff",
-    padding: "3rem",
-    borderRadius: "2rem",
+  container: {
+    padding: "2rem",
     textAlign: "center"
   },
 
-  btn: {
+  grid: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "1rem"
+  },
+
+  box: {
+    padding: "1rem",
+    background: "var(--card)",
+    borderRadius: "10px"
+  },
+
+  card: {
+    padding: "2rem",
+    background: "var(--card)",
+    margin: "2rem"
+  },
+
+  option: {
+    display: "block",
+    margin: "10px",
+    padding: "10px"
+  },
+
+  pref: {
+    marginTop: "2rem"
+  },
+
+  submit: {
     marginTop: "1rem",
-    padding: "0.75rem 1.5rem",
-    border: "none",
-    borderRadius: "1rem",
-    background: "#2563eb",
+    padding: "10px",
+    background: "#16a34a",
     color: "#fff"
   },
 
-  progress: {
-    fontSize: "0.8rem",
-    color: "#6b7280"
+  result: {
+    textAlign: "center",
+    marginTop: "3rem"
   }
 };
 
