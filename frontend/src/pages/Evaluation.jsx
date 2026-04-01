@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import SidebarMenu from "../components/SidebarMenu";
 import ProjectLogo from "../components/Logo";
+import { useNavigate } from "react-router-dom";
 
 const Evaluation = () => {
+  const navigate = useNavigate();
+
   const [darkMode, setDarkMode] = useState(false);
   const [activeSectionIndex, setActiveSectionIndex] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [scores, setScores] = useState({});
-  const [showResult, setShowResult] = useState(false);
 
-  // 🌙 THEME LOAD
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -28,65 +29,138 @@ const Evaluation = () => {
   };
 
   const theme = {
-    light: {
-      bg: "#f8fafc",
-      card: "#ffffff",
-      text: "#0f172a",
-      sub: "#64748b",
-      primary: "#4f46e5"
-    },
-    dark: {
-      bg: "#020617",
-      card: "#1e293b",
-      text: "#f1f5f9",
-      sub: "#94a3b8",
-      primary: "#6366f1"
-    }
+    light: { bg: "#f8fafc", card: "#fff", text: "#111", primary: "#4f46e5" },
+    dark: { bg: "#020617", card: "#1e293b", text: "#fff", primary: "#6366f1" }
   };
 
   const t = darkMode ? theme.dark : theme.light;
 
-  // 🧠 SECTIONS ORDER
   const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
 
-  // 📚 QUESTION BANK
+  // 🔥 BIG SCENARIO QUESTIONS
   const questionBank = {
     Aptitude: [
-      { q: "Cost reduced by 20% from 500?", options: ["400","450","420","380"], ans: "400" },
-      { q: "5 units double daily. Day3?", options: ["20","15","10","25"], ans: "20" },
-      { q: "60km/hr for 3 hrs?", options: ["180","150","120","200"], ans: "180" },
-      { q: "Profit 200 on 800?", options: ["25%","20%","30%","40%"], ans: "25%" },
-      { q: "SI on 1000 @10% 2yr?", options: ["200","100","300","400"], ans: "200" }
+      {
+        q: "A startup produces 150 units/day. Due to system failure, productivity drops by 30% for 2 days and increases by 20% on the third day. What is total production?",
+        options: ["351", "360", "375", "390"],
+        ans: "351"
+      },
+      {
+        q: "A company invests ₹50,000 at 10% annual simple interest. What is the total amount after 3 years?",
+        options: ["65000", "66000", "64000", "68000"],
+        ans: "65000"
+      },
+      {
+        q: "A train covers 120 km in 2 hours. If speed increases by 25%, how long to cover 150 km?",
+        options: ["2 hr", "2.5 hr", "3 hr", "1.5 hr"],
+        ans: "2 hr"
+      },
+      {
+        q: "A person buys a laptop for 40,000 and sells it at 20% profit. Selling price?",
+        options: ["48000", "46000", "50000", "44000"],
+        ans: "48000"
+      },
+      {
+        q: "A worker completes a task in 10 days. Another in 5 days. Together?",
+        options: ["3.33", "4", "2", "5"],
+        ans: "3.33"
+      }
     ],
+
     Logical: [
-      { q: "All devs testers. Some testers mgrs?", options: ["All","Some may","None","All mgr"], ans: "Some may" },
-      { q: "A>B, B>C?", options: ["A>C","C>A","A=B","None"], ans: "A>C" },
-      { q: "Odd one?", options: ["Carrot","Apple","Mango","Banana"], ans: "Carrot" },
-      { q: "2,4,8,16?", options: ["32","24","20","18"], ans: "32" },
-      { q: "Mirror LEFT?", options: ["TFEL","LEFT","EF","None"], ans: "TFEL" }
+      {
+        q: "All engineers are problem solvers. Some problem solvers are leaders. Which is correct?",
+        options: [
+          "All engineers are leaders",
+          "Some engineers may be leaders",
+          "No engineer is a leader",
+          "All leaders are engineers"
+        ],
+        ans: "Some engineers may be leaders"
+      },
+      {
+        q: "If coding is faster than testing and testing is faster than debugging, then?",
+        options: ["Coding > Debugging", "Debugging > Coding", "Same", "None"],
+        ans: "Coding > Debugging"
+      },
+      {
+        q: "Find odd: CPU, RAM, SSD, Keyboard",
+        options: ["Keyboard", "CPU", "RAM", "SSD"],
+        ans: "Keyboard"
+      },
+      {
+        q: "Series: 3, 9, 27, ?",
+        options: ["81", "72", "90", "60"],
+        ans: "81"
+      },
+      {
+        q: "Mirror of CODE?",
+        options: ["EDOC", "CODE", "OCED", "None"],
+        ans: "EDOC"
+      }
     ],
+
     Verbal: [
-      { q: "Efficient?", options: ["Productive","Lazy","Slow","Weak"], ans: "Productive" },
-      { q: "Rapid?", options: ["Fast","Slow","Late","Stop"], ans: "Fast" },
-      { q: "Correct sentence?", options: ["She go","She goes","She going","She gone"], ans: "She goes" },
-      { q: "Opposite strong?", options: ["Weak","Hard","Big","Solid"], ans: "Weak" },
-      { q: "Execute?", options: ["Perform","Stop","Break","Cancel"], ans: "Perform" }
+      {
+        q: "‘Robust system’ means?",
+        options: ["Strong", "Weak", "Slow", "Broken"],
+        ans: "Strong"
+      },
+      {
+        q: "Synonym of ‘Enhance’?",
+        options: ["Improve", "Reduce", "Stop", "Break"],
+        ans: "Improve"
+      },
+      {
+        q: "Choose correct: He ___ working yesterday.",
+        options: ["was", "is", "are", "were"],
+        ans: "was"
+      },
+      {
+        q: "Opposite of ‘Flexible’?",
+        options: ["Rigid", "Soft", "Elastic", "Loose"],
+        ans: "Rigid"
+      },
+      {
+        q: "‘Deploy’ means?",
+        options: ["Release", "Stop", "Delete", "Break"],
+        ans: "Release"
+      }
     ],
+
     Technical: [
-      { q: "C is?", options: ["Procedural","OOP","Script","Markup"], ans: "Procedural" },
-      { q: "OS manages?", options: ["HW","Programs","Memory","All"], ans: "All" },
-      { q: "TCP layer?", options: ["Transport","Network","DL","Physical"], ans: "Transport" },
-      { q: "Java is?", options: ["OOP","Procedural","None","Func"], ans: "OOP" },
-      { q: "RAM?", options: ["Temporary","Permanent","External","None"], ans: "Temporary" }
+      {
+        q: "Which data structure uses FIFO?",
+        options: ["Queue", "Stack", "Tree", "Graph"],
+        ans: "Queue"
+      },
+      {
+        q: "Which OS concept allows multitasking?",
+        options: ["Process Scheduling", "Paging", "Segmentation", "Deadlock"],
+        ans: "Process Scheduling"
+      },
+      {
+        q: "Java supports?",
+        options: ["OOP", "Procedural", "None", "Only scripting"],
+        ans: "OOP"
+      },
+      {
+        q: "Which protocol is used for web?",
+        options: ["HTTP", "FTP", "SMTP", "TCP"],
+        ans: "HTTP"
+      },
+      {
+        q: "Which memory is fastest?",
+        options: ["Cache", "RAM", "ROM", "Disk"],
+        ans: "Cache"
+      }
     ]
   };
 
-  // 🎲 RANDOM QUESTIONS
   const getRandom = (sec) => {
     return [...questionBank[sec]].sort(() => 0.5 - Math.random()).slice(0, 5);
   };
 
-  // ▶ START TEST
   const startTest = (index) => {
     const sec = sections[index];
     setActiveSectionIndex(index);
@@ -94,7 +168,6 @@ const Evaluation = () => {
     setAnswers({});
   };
 
-  // ✅ SUBMIT SECTION
   const submitSection = () => {
     const sec = sections[activeSectionIndex];
     let score = 0;
@@ -103,30 +176,32 @@ const Evaluation = () => {
       if (answers[i] === q.ans) score++;
     });
 
-    setScores(prev => ({ ...prev, [sec]: score }));
+    const updatedScores = { ...scores, [sec]: score };
+    setScores(updatedScores);
 
-    // 👉 NEXT SECTION
-    if (activeSectionIndex < sections.length - 1) {
-      startTest(activeSectionIndex + 1);
+    // 👉 FINAL REDIRECT
+    if (activeSectionIndex === sections.length - 1) {
+      const total = Object.values(updatedScores).reduce((a, b) => a + b, 0);
+      const percent = (total / (sections.length * 5)) * 100;
+
+      let status = "";
+      if (percent >= 75) status = "READY";
+      else if (percent >= 50) status = "ALMOST READY";
+      else status = "NOT READY";
+
+      navigate("/result", {
+        state: { total, percent, status }
+      });
+
     } else {
-      setShowResult(true);
-      setActiveSectionIndex(null);
+      startTest(activeSectionIndex + 1);
     }
   };
-
-  // 🎯 FINAL RESULT
-  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-  const percent = (totalScore / (sections.length * 5)) * 100;
-
-  let status = "";
-  if (percent >= 75) status = "READY ✅";
-  else if (percent >= 50) status = "ALMOST READY ⚠️";
-  else status = "NOT READY ❌";
 
   return (
     <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
 
-      {/* NAVBAR */}
+      {/* NAV */}
       <nav style={{ display: "flex", justifyContent: "space-between", padding: "1rem 2rem" }}>
         <ProjectLogo />
         <div style={{ display: "flex", gap: "15px" }}>
@@ -137,18 +212,8 @@ const Evaluation = () => {
 
       <div style={{ maxWidth: "800px", margin: "auto", padding: "2rem" }}>
 
-        {/* 🎯 RESULT */}
-        {showResult && (
-          <div style={{ padding: "2rem", background: t.card, borderRadius: "12px" }}>
-            <h2>Final Result</h2>
-            <h1>{status}</h1>
-            <p>Score: {totalScore}</p>
-            <p>{percent.toFixed(1)}%</p>
-          </div>
-        )}
-
-        {/* 🧠 QUESTIONS */}
-        {activeSectionIndex !== null && !showResult && (
+        {/* QUESTIONS */}
+        {activeSectionIndex !== null ? (
           <>
             <h2>{sections[activeSectionIndex]} Test</h2>
 
@@ -165,8 +230,7 @@ const Evaluation = () => {
                       margin: "5px 0",
                       background: answers[i] === opt ? t.primary : "#ddd",
                       color: answers[i] === opt ? "#fff" : "#000",
-                      padding: "6px",
-                      border: "none"
+                      padding: "6px"
                     }}
                   >
                     {opt}
@@ -175,12 +239,13 @@ const Evaluation = () => {
               </div>
             ))}
 
-            <button onClick={submitSection}>Submit & Next →</button>
+            <button onClick={submitSection}>
+              {activeSectionIndex === sections.length - 1
+                ? "Final Submit 🚀"
+                : "Submit & Next →"}
+            </button>
           </>
-        )}
-
-        {/* 📦 MAIN UI (UNCHANGED) */}
-        {activeSectionIndex === null && !showResult && (
+        ) : (
           <>
             <h1>Assessment</h1>
 
@@ -189,7 +254,6 @@ const Evaluation = () => {
                 padding: "20px",
                 marginBottom: "15px",
                 background: t.card,
-                borderRadius: "12px",
                 display: "flex",
                 justifyContent: "space-between"
               }}>
