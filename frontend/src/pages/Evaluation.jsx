@@ -17,7 +17,6 @@ const Evaluation = () => {
   const [selectedCompany, setSelectedCompany] = useState("");
   const [interest, setInterest] = useState("");
 
-  // 🌙 Load theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -36,17 +35,19 @@ const Evaluation = () => {
 
   const theme = {
     light: {
-      bg: "#f8fafc",
-      card: "#ffffff",
+      bg: "linear-gradient(135deg,#f8fafc,#eef2ff)",
+      card: "rgba(255,255,255,0.7)",
       text: "#0f172a",
       sub: "#64748b",
+      border: "#e2e8f0",
       primary: "#4f46e5"
     },
     dark: {
-      bg: "#020617",
-      card: "#1e293b",
+      bg: "linear-gradient(135deg,#020617,#0f172a)",
+      card: "rgba(30,41,59,0.6)",
       text: "#f1f5f9",
       sub: "#94a3b8",
+      border: "#334155",
       primary: "#6366f1"
     }
   };
@@ -55,25 +56,21 @@ const Evaluation = () => {
 
   const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
 
-  // 📚 BIG SCENARIO QUESTIONS
   const questionBank = {
     Aptitude: [
       { q: "A company reduces cost by 20% from ₹500. New cost?", options: ["400","450","420","380"], ans: "400" },
       { q: "Salary increases 10% yearly. After 2 yrs ₹10000?", options: ["12100","11000","12000","12200"], ans: "12100" },
       { q: "Train 60km/hr for 3 hrs distance?", options: ["180","150","200","210"], ans: "180" },
       { q: "Profit ₹200 on ₹800 investment?", options: ["25%","20%","30%","40%"], ans: "25%" },
-      { q: "Simple Interest ₹1000 @10% 2 yrs?", options: ["200","100","300","400"], ans: "200" },
-      { q: "Ratio 2:3 total 100?", options: ["40,60","50,50","30,70","20,80"], ans: "40,60" }
+      { q: "SI ₹1000 @10% 2 yrs?", options: ["200","100","300","400"], ans: "200" }
     ],
-
     Logical: [
       { q: "All devs testers. Some testers managers?", options: ["All","Some may","None","All mgr"], ans: "Some may" },
-      { q: "A > B, B > C. Relation?", options: ["A > C","C > A","Equal","None"], ans: "A > C" },
-      { q: "Odd one: Apple, Mango, Carrot, Banana", options: ["Carrot","Apple","Mango","Banana"], ans: "Carrot" },
-      { q: "Series: 2,4,8,16 ?", options: ["32","24","20","18"], ans: "32" },
+      { q: "A > B, B > C?", options: ["A > C","C > A","Equal","None"], ans: "A > C" },
+      { q: "Odd one: Apple, Mango, Carrot?", options: ["Carrot","Apple","Mango","Banana"], ans: "Carrot" },
+      { q: "Series 2,4,8,16?", options: ["32","24","20","18"], ans: "32" },
       { q: "Mirror LEFT?", options: ["TFEL","LEFT","EF","None"], ans: "TFEL" }
     ],
-
     Verbal: [
       { q: "Efficient means?", options: ["Productive","Lazy","Slow","Weak"], ans: "Productive" },
       { q: "Rapid means?", options: ["Fast","Slow","Late","Stop"], ans: "Fast" },
@@ -81,7 +78,6 @@ const Evaluation = () => {
       { q: "Opposite of strong?", options: ["Weak","Hard","Big","Solid"], ans: "Weak" },
       { q: "Execute means?", options: ["Perform","Stop","Break","Cancel"], ans: "Perform" }
     ],
-
     Technical: [
       { q: "C language type?", options: ["Procedural","OOP","Script","Markup"], ans: "Procedural" },
       { q: "OS manages?", options: ["HW","Programs","Memory","All"], ans: "All" },
@@ -96,21 +92,18 @@ const Evaluation = () => {
   };
 
   const startTest = (index) => {
-    const sec = sections[index];
     setActiveSectionIndex(index);
-    setQuestions(getRandom(sec));
+    setQuestions(getRandom(sections[index]));
     setAnswers({});
   };
 
   const submitSection = () => {
-    const sec = sections[activeSectionIndex];
     let score = 0;
-
     questions.forEach((q, i) => {
       if (answers[i] === q.ans) score++;
     });
 
-    setScores(prev => ({ ...prev, [sec]: score }));
+    setScores(prev => ({ ...prev, [sections[activeSectionIndex]]: score }));
 
     if (activeSectionIndex < sections.length - 1) {
       startTest(activeSectionIndex + 1);
@@ -119,52 +112,23 @@ const Evaluation = () => {
     }
   };
 
-  const generateRecommendations = () => {
-    let rec = [];
-
-    if ((scores.Aptitude || 0) < 3) rec.push("Improve aptitude skills");
-    if ((scores.Logical || 0) < 3) rec.push("Practice logical reasoning");
-    if ((scores.Verbal || 0) < 3) rec.push("Improve communication");
-    if ((scores.Technical || 0) < 3) rec.push("Focus on core subjects");
-
-    return rec;
-  };
-
   const handleFinalSubmit = async () => {
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
 
     const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-    const percent = (totalScore / 20) * 100;
-
-    let status = "";
-    if (percent >= 75) status = "READY";
-    else if (percent >= 50) status = "ALMOST READY";
-    else status = "NOT READY";
 
     try {
-      const res = await axios.post(
-        `${API_BASE}/api/evaluation`,
-        {
-          aptitudeScore: scores.Aptitude || 0,
-          logicalScore: scores.Logical || 0,
-          communicationScore: scores.Verbal || 0,
-          technicalScore: scores.Technical || 0,
-          leadershipScore: 0,
-          totalScore,
-          status,
-          companyPreference: selectedCompany,
-          interest,
-          recommendations: generateRecommendations()
-        },
-        { headers: { "x-auth-token": token } }
-      );
+      const res = await axios.post(`${API_BASE}/api/evaluation`, {
+        totalScore,
+        status: totalScore > 12 ? "READY" : "NOT READY",
+        companyPreference: selectedCompany,
+        interest
+      }, { headers: { "x-auth-token": token } });
 
       navigate(`/result?id=${res.data._id}`);
-
     } catch (err) {
-      console.error(err);
-      alert("Submission failed");
+      alert("Error submitting");
     }
   };
 
@@ -172,9 +136,14 @@ const Evaluation = () => {
     <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
 
       {/* NAVBAR */}
-      <nav style={{ display: "flex", justifyContent: "space-between", padding: "1rem 2rem" }}>
+      <nav style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "1rem 2rem",
+        borderBottom: `1px solid ${t.border}`
+      }}>
         <ProjectLogo />
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "15px" }}>
           <button onClick={toggleTheme}>
             {darkMode ? "🌞" : "🌙"}
           </button>
@@ -182,15 +151,24 @@ const Evaluation = () => {
         </div>
       </nav>
 
-      <div style={{ maxWidth: "800px", margin: "auto", padding: "2rem" }}>
+      <div style={{ maxWidth: "900px", margin: "auto", padding: "2rem" }}>
+
+        <h1 style={{ fontSize: "2.5rem", fontWeight: "900", marginBottom: "2rem" }}>
+          Assessment 🚀
+        </h1>
 
         {/* QUESTIONS */}
         {activeSectionIndex !== null && (
-          <>
+          <div style={{
+            padding: "2rem",
+            borderRadius: "20px",
+            background: t.card,
+            backdropFilter: "blur(20px)"
+          }}>
             <h2>{sections[activeSectionIndex]}</h2>
 
             {questions.map((q, i) => (
-              <div key={i}>
+              <div key={i} style={{ marginTop: "1rem" }}>
                 <p>{q.q}</p>
                 {q.options.map(opt => (
                   <button
@@ -198,9 +176,12 @@ const Evaluation = () => {
                     onClick={() => setAnswers({ ...answers, [i]: opt })}
                     style={{
                       display: "block",
-                      margin: "5px 0",
-                      background: answers[i] === opt ? t.primary : "#ccc",
-                      color: "#fff"
+                      margin: "6px 0",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "none",
+                      background: answers[i] === opt ? t.primary : "#e2e8f0",
+                      color: answers[i] === opt ? "#fff" : "#000"
                     }}
                   >
                     {opt}
@@ -209,32 +190,36 @@ const Evaluation = () => {
               </div>
             ))}
 
-            <button onClick={submitSection}>Submit & Next →</button>
-          </>
+            <button onClick={submitSection} style={{ marginTop: "20px" }}>
+              Submit & Next →
+            </button>
+          </div>
         )}
 
-        {/* MAIN */}
+        {/* MAIN CARDS */}
         {activeSectionIndex === null && (
-          <>
-            <h1>Assessment</h1>
-
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             {sections.map((sec, i) => (
-              <div key={i}>
-                <h3>{sec}</h3>
-                <button onClick={() => startTest(i)}>Take Assessment</button>
+              <div key={i} style={{
+                padding: "20px",
+                borderRadius: "20px",
+                background: t.card,
+                display: "flex",
+                justifyContent: "space-between"
+              }}>
+                <div>
+                  <h3>{sec}</h3>
+                  <p style={{ color: t.sub }}>Test your {sec} skills</p>
+                </div>
+                <button onClick={() => startTest(i)}>Take Test →</button>
               </div>
             ))}
 
-            {/* INTEREST */}
-            <h3>Select Interest</h3>
             <select onChange={(e) => setInterest(e.target.value)}>
               <option>ML</option>
               <option>Web</option>
-              <option>AI</option>
             </select>
 
-            {/* COMPANY */}
-            <h3>Company Preference</h3>
             <select onChange={(e) => setSelectedCompany(e.target.value)}>
               <option>Product</option>
               <option>Service</option>
@@ -242,9 +227,9 @@ const Evaluation = () => {
             </select>
 
             <button onClick={handleFinalSubmit}>
-              Final Submit →
+              Final Submit 🚀
             </button>
-          </>
+          </div>
         )}
 
       </div>
