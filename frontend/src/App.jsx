@@ -9,6 +9,7 @@ import Evaluation from './pages/Evaluation';
 import Result from './pages/Result';
 import Profile from './pages/Profile';
 import History from './pages/History';
+import PlatformDetails from './pages/PlatformDetails';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/result" element={<Result />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/history" element={<History />} />
+          <Route path="/overview" element={<PlatformDetails />} />
         </Routes>
       </div>
     </Router>

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import SidebarMenu from "../components/SidebarMenu";
-import ProjectLogo from "../components/Logo";
+import TopNav from "../components/TopNav";
 import { useNavigate } from "react-router-dom";
 import API_BASE from "../config";
 import { getRandomQuestions } from "../utils/questions";
@@ -9,7 +8,6 @@ import { getRandomQuestions } from "../utils/questions";
 const Evaluation = () => {
   const navigate = useNavigate();
 
-  const [darkMode, setDarkMode] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
   const [answers, setAnswers] = useState({});
   const [questions, setQuestions] = useState([]);
@@ -20,49 +18,6 @@ const Evaluation = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const sections = ["Aptitude", "Logical", "Verbal", "Technical"];
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
-      setDarkMode(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const root = document.documentElement;
-    root.classList.toggle("dark");
-    const isDark = root.classList.contains("dark");
-    setDarkMode(isDark);
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  };
-
-  const getUserInitial = () => {
-    const email = localStorage.getItem("email");
-    if (email && email.length > 0) {
-      return email[0].toUpperCase();
-    }
-    return "U";
-  };
-
-  const theme = {
-    light: {
-      bg: "#f1f5f9",
-      card: "#ffffff",
-      text: "#0f172a",
-      border: "#e2e8f0",
-      primary: "#4f46e5"
-    },
-    dark: {
-      bg: "#020617",
-      card: "#1e293b",
-      text: "#f1f5f9",
-      border: "#334155",
-      primary: "#6366f1"
-    }
-  };
-
-  const t = darkMode ? theme.dark : theme.light;
 
   const startTest = (section) => {
     setActiveSection(section);
@@ -117,7 +72,7 @@ const Evaluation = () => {
       console.error("Evaluation submit error:", err);
       const errorMsg =
         err.response?.data?.msg ||
-        (err.request ? "Cannot reach backend. Make sure backend is running on port 5000." : "Failed to save evaluation.");
+        (err.request ? "Cannot reach backend." : "Failed to save evaluation.");
       alert(errorMsg);
     } finally {
       setSubmitting(false);
@@ -125,58 +80,26 @@ const Evaluation = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: t.bg, color: t.text }}>
-      <nav
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "1rem 2rem",
-          borderBottom: `1px solid ${t.border}`
-        }}
-      >
-        <ProjectLogo />
+    <div style={{ minHeight: "100vh", background: 'var(--bg)', color: 'var(--text)', transition: 'all 0.4s ease' }}>
+      <TopNav />
 
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          <button onClick={toggleTheme}>
-            {darkMode ? "Dark" : "Light"}
-          </button>
-
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#fff",
-              fontWeight: "700"
-            }}
-          >
-            {getUserInitial()}
-          </div>
-
-          <SidebarMenu color={t.text} />
-        </div>
-      </nav>
-
-      <div style={{ maxWidth: "900px", margin: "auto", padding: "2rem" }}>
+      <div style={{ maxWidth: "800px", margin: "auto", padding: "4rem 2rem" }}>
         {activeSection && (
-          <>
-            <h2>{activeSection} Test</h2>
+          <div style={{ background: 'var(--card)', padding: '2rem', borderRadius: '1rem', border: '1px solid var(--border)' }}>
+            <h2 style={{ fontSize: '1.8rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>{activeSection} Test</h2>
 
             {questions.map((q, i) => (
               <div
                 key={i}
                 style={{
-                  margin: "1rem 0",
-                  padding: "1rem",
-                  background: t.card,
-                  borderRadius: "10px"
+                  margin: "1.5rem 0",
+                  padding: "1.5rem",
+                  background: 'var(--bg)',
+                  borderRadius: "10px",
+                  border: '1px solid var(--border)'
                 }}
               >
-                <p>{q.q}</p>
+                <p style={{ fontWeight: '600', marginBottom: '1rem', fontSize: '1.1rem' }}>{i + 1}. {q.q}</p>
 
                 {q.options.map((opt) => (
                   <button
@@ -185,12 +108,15 @@ const Evaluation = () => {
                     style={{
                       display: "block",
                       width: "100%",
-                      margin: "5px 0",
-                      padding: "10px",
+                      margin: "8px 0",
+                      padding: "12px 16px",
                       borderRadius: "8px",
-                      border: "none",
-                      background: answers[i] === opt ? t.primary : t.border,
-                      color: answers[i] === opt ? "#fff" : t.text
+                      border: `1px solid ${answers[i] === opt ? 'var(--primary)' : 'var(--border)'}`,
+                      background: answers[i] === opt ? 'var(--primary)' : 'var(--card)',
+                      color: answers[i] === opt ? "#fff" : 'var(--text)',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
                     }}
                   >
                     {opt}
@@ -202,21 +128,26 @@ const Evaluation = () => {
             <button
               onClick={submitSection}
               style={{
-                background: "green",
+                background: "#10b981",
                 color: "#fff",
-                padding: "12px",
+                padding: "14px",
                 width: "100%",
-                borderRadius: "8px"
+                borderRadius: "12px",
+                marginTop: "1rem",
+                border: "none",
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                cursor: "pointer"
               }}
             >
               Submit Section
             </button>
-          </>
+          </div>
         )}
 
         {!activeSection && (
-          <>
-            <h1>Assessment</h1>
+          <div style={{ background: 'var(--card)', padding: '2.5rem', borderRadius: '1.5rem', border: '1px solid var(--border)', boxShadow: '0 10px 40px var(--border)' }}>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '2rem' }}>Assessment Modules</h1>
 
             {sections.map((sec) => (
               <div
@@ -224,79 +155,97 @@ const Evaluation = () => {
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  padding: "15px",
-                  background: t.card,
-                  margin: "10px 0",
-                  borderRadius: "10px"
+                  alignItems: "center",
+                  padding: "20px 24px",
+                  background: 'var(--bg)',
+                  margin: "12px 0",
+                  borderRadius: "12px",
+                  border: '1px solid var(--border)'
                 }}
               >
-                <h3>{sec}</h3>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '600' }}>{sec}</h3>
 
                 <button
                   onClick={() => startTest(sec)}
+                  disabled={completed[sec]}
                   style={{
-                    background: completed[sec] ? "green" : "red",
+                    background: completed[sec] ? "#10b981" : "var(--primary)",
                     color: "#fff",
-                    padding: "8px 14px",
-                    borderRadius: "8px"
+                    padding: "10px 20px",
+                    borderRadius: "10px",
+                    border: "none",
+                    fontWeight: "bold",
+                    cursor: completed[sec] ? "default" : "pointer"
                   }}
                 >
-                  {completed[sec] ? "Completed" : "Take Test"}
+                  {completed[sec] ? "✓ Completed" : "Take Test"}
                 </button>
               </div>
             ))}
 
-            <input
-              placeholder="Enter your interest"
-              value={interest}
-              onChange={(e) => setInterest(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "15px",
-                borderRadius: "8px",
-                border: `1px solid ${t.border}`,
-                background: t.card,
-                color: t.text
-              }}
-            />
+            <div style={{ marginTop: '2rem' }}>
+                <label style={{ fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>Key Interest Area</label>
+                <input
+                placeholder="E.g., Web Development"
+                value={interest}
+                onChange={(e) => setInterest(e.target.value)}
+                style={{
+                    width: "100%",
+                    padding: "14px",
+                    borderRadius: "10px",
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    color: 'var(--text)',
+                    fontSize: '1rem',
+                    boxSizing: 'border-box'
+                }}
+                />
+            </div>
 
-            <select
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "10px",
-                borderRadius: "8px",
-                border: `1px solid ${t.border}`,
-                background: t.card,
-                color: t.text
-              }}
-            >
-              <option value="">Select Company</option>
-              <option>Product</option>
-              <option>Service</option>
-              <option>Startup</option>
-            </select>
+            <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>Company Preference</label>
+                <select
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                style={{
+                    width: "100%",
+                    padding: "14px",
+                    borderRadius: "10px",
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    color: 'var(--text)',
+                    fontSize: '1rem',
+                    boxSizing: 'border-box'
+                }}
+                >
+                <option value="">Select Company</option>
+                <option>Product Based</option>
+                <option>Service Based</option>
+                <option>Startup</option>
+                </select>
+            </div>
 
             <button
               onClick={finalSubmit}
               disabled={submitting}
               style={{
-                marginTop: "20px",
+                marginTop: "2.5rem",
                 width: "100%",
-                background: t.primary,
+                background: 'var(--primary)',
                 color: "#fff",
-                padding: "12px",
-                borderRadius: "10px",
+                padding: "16px",
+                borderRadius: "12px",
+                border: "none",
+                fontWeight: "bold",
+                fontSize: "1.1rem",
                 opacity: submitting ? 0.7 : 1,
-                cursor: submitting ? "not-allowed" : "pointer"
+                cursor: submitting ? "not-allowed" : "pointer",
+                boxShadow: '0 8px 20px rgba(99, 102, 241, 0.4)'
               }}
             >
-              {submitting ? "Saving..." : "Final Submit ->"}
+              {submitting ? "Processing results..." : "Generate Final Report ->"}
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>

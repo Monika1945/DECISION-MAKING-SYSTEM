@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import SidebarMenu from '../components/SidebarMenu';
-import ProjectLogo from '../components/Logo';
+import TopNav from '../components/TopNav';
 import API_BASE from '../config';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
     const [latestEval, setLatestEval] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [darkMode, setDarkMode] = useState(true);
 
     const navigate = useNavigate();
 
@@ -28,6 +26,10 @@ const Dashboard = () => {
                 });
 
                 setUser(userRes.data);
+                // Save name and email for avatar
+                if (userRes.data.name) localStorage.setItem('userName', userRes.data.name);
+                if (userRes.data.email) localStorage.setItem('userEmail', userRes.data.email);
+
                 setLatestEval(evalRes.data);
             } catch (err) {
                 if (err.response?.status === 401) {
@@ -44,15 +46,12 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black">
-                <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
+                <div style={{ width: '3rem', height: '3rem', border: '4px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                <style>{"@keyframes spin { 100% { transform: rotate(360deg); } }"}</style>
             </div>
         );
     }
-
-    const theme = darkMode
-        ? "bg-black text-white"
-        : "bg-gradient-to-br from-slate-50 to-blue-100 text-gray-900";
 
     const totalScore = latestEval?.totalScore || 0;
     const maxScore = latestEval?.maxScore || 20;
@@ -66,96 +65,77 @@ const Dashboard = () => {
         : null;
 
     return (
-        <div className={`min-h-screen ${theme} transition-all duration-500`}>
-            <nav className="flex justify-between items-center px-8 py-4 backdrop-blur-xl border-b border-white/10">
-                <ProjectLogo />
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)', transition: 'all 0.5s' }}>
+            <TopNav />
 
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => setDarkMode(!darkMode)}
-                        className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition"
-                    >
-                        {darkMode ? "Dark" : "Light"}
-                    </button>
-
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                        {user?.email?.charAt(0).toUpperCase()}
-                    </div>
-
-                    <SidebarMenu />
-                </div>
-            </nav>
-
-            <div className="max-w-6xl mx-auto px-6 py-10">
-                <div className="mb-10">
-                    <h1 className="text-4xl font-extrabold">
+            <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+                <div style={{ marginBottom: '2.5rem' }}>
+                    <h1 style={{ fontSize: '2.25rem', fontWeight: '800', marginBottom: '0.5rem' }}>
                         Welcome back, {user?.name}
                     </h1>
-                    <p className="text-gray-400 mt-2">
+                    <p style={{ color: 'var(--sub)', fontSize: '1.1rem' }}>
                         Keep building your placement readiness one assessment at a time.
                     </p>
                 </div>
 
                 {!latestEval ? (
-                    <div className="p-10 rounded-3xl backdrop-blur-xl bg-white/10 text-center">
-                        <h2 className="text-2xl font-bold mb-3">
+                    <div style={{ padding: '2.5rem', borderRadius: '1.5rem', backgroundColor: 'var(--card)', textAlign: 'center', border: '1px solid var(--border)', boxShadow: '0 10px 30px var(--border)' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.75rem' }}>
                             Start your journey
                         </h2>
-                        <p className="text-gray-400 mb-6">
+                        <p style={{ color: 'var(--sub)', marginBottom: '1.5rem' }}>
                             Take your first assessment and unlock insights.
                         </p>
 
                         <Link
                             to="/evaluation"
-                            className="px-6 py-3 bg-purple-600 rounded-xl"
+                            style={{ display: 'inline-block', padding: '0.75rem 1.5rem', backgroundColor: 'var(--primary)', color: 'white', borderRadius: '0.75rem', textDecoration: 'none', fontWeight: '600' }}
                         >
                             Start Now
                         </Link>
                     </div>
                 ) : (
                     <>
-                        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl mb-8 hover:scale-[1.02] transition">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <p className="text-sm text-gray-400 mb-2">
-                                        Your most recent assessment
+                        <div style={{ padding: '2rem', borderRadius: '1.5rem', backgroundColor: 'var(--card)', marginBottom: '2rem', border: '1px solid var(--border)', boxShadow: '0 10px 30px var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--sub)', marginBottom: '0.5rem' }}>
+                                    Your most recent assessment
+                                </p>
+
+                                <h2 style={{ fontSize: '3rem', fontWeight: 'bold' }}>
+                                    {totalScore} / {maxScore}
+                                </h2>
+
+                                <p style={{ marginTop: '0.5rem', color: '#4ade80', fontWeight: '600' }}>
+                                    {latestEval.status}
+                                </p>
+
+                                <p style={{ color: 'var(--sub)', marginTop: '0.25rem' }}>
+                                    {percent.toFixed(1)}%
+                                </p>
+
+                                {lastAssessmentDate && (
+                                    <p style={{ color: 'var(--sub)', marginTop: '0.25rem', fontSize: '0.875rem' }}>
+                                        Last attended: {lastAssessmentDate}
                                     </p>
-
-                                    <h2 className="text-5xl font-bold">
-                                        {totalScore} / {maxScore}
-                                    </h2>
-
-                                    <p className="mt-2 text-green-400">
-                                        {latestEval.status}
-                                    </p>
-
-                                    <p className="text-gray-400 mt-1">
-                                        {percent.toFixed(1)}%
-                                    </p>
-
-                                    {lastAssessmentDate && (
-                                        <p className="text-gray-400 mt-1">
-                                            Last attended: {lastAssessmentDate}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <button
-                                    onClick={() => navigate('/evaluation')}
-                                    className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold hover:scale-105 transition"
-                                >
-                                    Retake Test
-                                </button>
+                                )}
                             </div>
+
+                            <button
+                                onClick={() => navigate('/evaluation')}
+                                style={{ padding: '0.75rem 1.25rem', background: 'var(--primary)', borderRadius: '0.75rem', color: 'white', fontWeight: '600', border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)' }}
+                            >
+                                Retake Test
+                            </button>
                         </div>
 
-                        <div className="mb-8">
-                            <h3 className="text-xl font-bold mb-2">Performance Breakdown</h3>
-                            <p className="text-gray-400 mb-6">
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Performance Breakdown</h3>
+                            <p style={{ color: 'var(--sub)', marginBottom: '1.5rem' }}>
                                 Track your strengths and areas to improve.
                             </p>
 
-                            <div className="grid md:grid-cols-2 gap-6">
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
                                 {[
                                     { label: 'Aptitude', score: latestEval.aptitudeScore || 0, max: 5 },
                                     { label: 'Logical', score: latestEval.logicalScore || 0, max: 5 },
@@ -169,39 +149,38 @@ const Dashboard = () => {
 
                                     if (sectionPercent >= 75) {
                                         sectionStatus = "Strong";
-                                        color = "text-green-400";
+                                        color = "#4ade80";
                                     } else if (sectionPercent >= 50) {
                                         sectionStatus = "Average";
-                                        color = "text-yellow-400";
+                                        color = "#facc15";
                                     } else {
                                         sectionStatus = "Needs Focus";
-                                        color = "text-red-400";
+                                        color = "#f87171";
                                     }
 
                                     return (
                                         <div
                                             key={i}
-                                            className="p-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 hover:scale-[1.03] transition"
+                                            style={{ padding: '1.25rem', borderRadius: '1rem', backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
                                         >
-                                            <div className="flex justify-between items-center mb-3">
-                                                <h4 className="font-semibold">{item.label}</h4>
-                                                <span className={`text-sm font-semibold ${color}`}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                                                <h4 style={{ fontWeight: '600' }}>{item.label}</h4>
+                                                <span style={{ fontSize: '0.875rem', fontWeight: '600', color }}>
                                                     {sectionStatus}
                                                 </span>
                                             </div>
 
-                                            <p className="text-sm text-gray-400 mb-2">
+                                            <p style={{ fontSize: '0.875rem', color: 'var(--sub)', marginBottom: '0.5rem' }}>
                                                 {item.score} / {item.max}
                                             </p>
 
-                                            <div className="h-2 bg-white/10 rounded-full mb-2 overflow-hidden">
+                                            <div style={{ height: '0.5rem', backgroundColor: 'var(--border)', borderRadius: '9999px', marginBottom: '0.5rem', overflow: 'hidden' }}>
                                                 <div
-                                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
-                                                    style={{ width: `${sectionPercent}%` }}
+                                                    style={{ height: '100%', backgroundColor: 'var(--primary)', borderRadius: '9999px', width: `${sectionPercent}%`, transition: 'all 0.5s' }}
                                                 />
                                             </div>
 
-                                            <p className="text-xs text-gray-400">
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--sub)' }}>
                                                 {sectionPercent}% completed
                                             </p>
                                         </div>
@@ -210,11 +189,11 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        <div className="p-8 rounded-3xl bg-white/10 backdrop-blur-xl">
-                            <h3 className="font-bold mb-4">Growth Plan</h3>
+                        <div style={{ padding: '2rem', borderRadius: '1.5rem', backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
+                            <h3 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>Growth Plan</h3>
 
                             {latestEval.recommendations?.map((rec, i) => (
-                                <div key={i} className="p-3 mb-2 bg-white/10 rounded-lg">
+                                <div key={i} style={{ padding: '0.75rem', marginBottom: '0.5rem', backgroundColor: 'var(--border)', borderRadius: '0.5rem' }}>
                                     {rec}
                                 </div>
                             ))}

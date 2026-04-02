@@ -13,26 +13,26 @@ const Signup = () => {
     });
 
     const [loading, setLoading] = useState(false);
-    const [theme, setTheme] = useState('light');
+    const [isDark, setIsDark] = useState(false);
 
     const navigate = useNavigate();
 
-    // ✅ Load saved theme
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
+        setIsDark(savedTheme === 'dark');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     }, []);
 
-    // ✅ Apply theme globally
-    useEffect(() => {
-        document.body.className = theme;
-    }, [theme]);
-
-    // 🌗 Toggle Theme
     const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
+        const root = document.documentElement;
+        root.classList.toggle('dark');
+        const dark = root.classList.contains('dark');
+        setIsDark(dark);
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
     };
 
     const handleChange = (e) => {
@@ -50,10 +50,8 @@ const Signup = () => {
 
         try {
             await axios.post(`${API_BASE}/api/auth/register`, formData);
-
             alert("Account created successfully! Please login.");
             navigate('/login');
-
         } catch (err) {
             const errorMsg =
                 err.response?.data?.msg ||
@@ -64,17 +62,12 @@ const Signup = () => {
         }
     };
 
-    const isDark = theme === 'dark';
-
     return (
         <div style={styles.pageWrapper}>
-
-            {/* 🌗 Toggle Button */}
             <button onClick={toggleTheme} style={styles.themeBtn}>
                 {isDark ? '☀️ Light' : '🌙 Dark'}
             </button>
 
-            {/* Background */}
             <div style={styles.backgroundContainer}>
                 <div style={{
                     ...styles.blob,
@@ -91,18 +84,10 @@ const Signup = () => {
                 }}></div>
             </div>
 
-            <div style={{
-                ...styles.card,
-                background: isDark
-                    ? 'rgba(30,41,59,0.85)'
-                    : 'rgba(255,255,255,0.8)',
-                color: isDark ? '#fff' : '#111'
-            }}>
-
+            <div style={styles.card}>
                 <h2 style={styles.header}>Create Account</h2>
 
                 <form onSubmit={handleSubmit} style={styles.form}>
-
                     {["name", "email", "password", "department", "year"].map((field) => (
                         <div key={field} style={styles.inputGroup}>
                             <label style={styles.label}>
@@ -114,14 +99,7 @@ const Signup = () => {
                                 name={field}
                                 onChange={handleChange}
                                 required={field !== "department" && field !== "year"}
-                                style={{
-                                    ...styles.input,
-                                    background: isDark ? '#1e293b' : '#fff',
-                                    color: isDark ? '#fff' : '#111',
-                                    border: isDark
-                                        ? '1px solid #334155'
-                                        : '1px solid #ddd'
-                                }}
+                                style={styles.input}
                             />
                         </div>
                     ))}
@@ -136,7 +114,6 @@ const Signup = () => {
                     >
                         {loading ? "Creating..." : "Sign Up"}
                     </button>
-
                 </form>
 
                 <p style={styles.footerText}>
@@ -150,7 +127,6 @@ const Signup = () => {
     );
 };
 
-/* 🎨 STYLES */
 const styles = {
     pageWrapper: {
         minHeight: '100vh',
@@ -160,25 +136,30 @@ const styles = {
         position: 'relative',
         overflow: 'hidden',
         fontFamily: '"Inter", sans-serif',
+        background: 'var(--bg)',
+        color: 'var(--text)',
+        transition: 'all 0.4s'
     },
 
     themeBtn: {
         position: 'absolute',
         top: '20px',
         right: '20px',
-        padding: '8px 12px',
-        borderRadius: '8px',
+        padding: '8px 14px',
+        borderRadius: '20px',
         border: 'none',
         cursor: 'pointer',
-        background: '#6366f1',
+        background: 'var(--primary)',
         color: '#fff',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        zIndex: 20
     },
 
     backgroundContainer: {
         position: 'absolute',
         width: '100%',
         height: '100%',
+        zIndex: 0
     },
 
     blob: {
@@ -186,8 +167,8 @@ const styles = {
         width: '22rem',
         height: '22rem',
         borderRadius: '50%',
-        filter: 'blur(70px)',
-        opacity: 0.35,
+        filter: 'blur(100px)',
+        opacity: 0.25,
     },
 
     card: {
@@ -197,14 +178,17 @@ const styles = {
         width: '100%',
         maxWidth: '32rem',
         backdropFilter: 'blur(20px)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        boxShadow: '0 20px 40px var(--border)'
     },
 
     header: {
         fontSize: '2rem',
         textAlign: 'center',
         marginBottom: '2rem',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: 'var(--text)'
     },
 
     form: {
@@ -219,36 +203,47 @@ const styles = {
     },
 
     label: {
-        fontSize: '0.8rem',
-        marginBottom: '4px',
+        fontSize: '0.85rem',
+        marginBottom: '6px',
+        color: 'var(--sub)',
+        fontWeight: '600'
     },
 
     input: {
-        padding: '0.75rem',
+        padding: '0.8rem',
         borderRadius: '8px',
         outline: 'none',
-        transition: '0.2s'
+        transition: '0.2s',
+        background: 'var(--bg)',
+        color: 'var(--text)',
+        border: '1px solid var(--border)',
+        fontSize: '1rem',
+        boxSizing: 'border-box'
     },
 
     button: {
         marginTop: '1rem',
         padding: '0.9rem',
-        background: 'linear-gradient(to right, #2563eb, #9333ea)',
+        background: 'var(--primary)',
         color: '#fff',
         border: 'none',
         borderRadius: '8px',
         fontWeight: 'bold',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        fontSize: '1.05rem',
+        boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
     },
 
     footerText: {
-        marginTop: '1rem',
+        marginTop: '1.5rem',
         textAlign: 'center',
+        color: 'var(--sub)'
     },
 
     link: {
-        color: '#6366f1',
-        fontWeight: 'bold'
+        color: 'var(--primary)',
+        fontWeight: 'bold',
+        textDecoration: 'none'
     },
 };
 

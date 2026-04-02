@@ -8,14 +8,12 @@ const Home = () => {
 
     return (
         <div style={styles.pageWrapper}>
-            {/* Background Shapes */}
             <div style={styles.backgroundContainer}>
                 <div style={{ ...styles.blob, ...styles.blob1 }}></div>
                 <div style={{ ...styles.blob, ...styles.blob2 }}></div>
                 <div style={{ ...styles.blob, ...styles.blob3 }}></div>
             </div>
 
-            {/* Navbar */}
             <nav style={styles.navbar}>
                 <Link to="/" style={{ textDecoration: 'none' }}>
                     <ProjectLogo />
@@ -46,7 +44,6 @@ const Home = () => {
                 </div>
             </nav>
 
-            {/* Hero Section */}
             <div style={styles.heroSection}>
                 <h1 style={styles.heroTitle}>
                     Unlock Your <br />
@@ -83,20 +80,19 @@ const Home = () => {
                     </Link>
                 </div>
 
-                {/* Feature Cards */}
                 <div style={styles.featureGrid}>
                     <div style={styles.featureCard}>
-                        <div style={{ ...styles.iconBox, backgroundColor: '#dbeafe' }}>🚀</div>
+                        <div style={{ ...styles.iconBox, backgroundColor: 'rgba(59, 130, 246, 0.2)' }}>🚀</div>
                         <h3 style={styles.featureTitle}>Skill Analysis</h3>
                         <p style={styles.featureDesc}>Comprehensive evaluation of your technical and soft skills.</p>
                     </div>
                     <div style={styles.featureCard}>
-                        <div style={{ ...styles.iconBox, backgroundColor: '#f3e8ff' }}>📊</div>
+                        <div style={{ ...styles.iconBox, backgroundColor: 'rgba(168, 85, 247, 0.2)' }}>📊</div>
                         <h3 style={styles.featureTitle}>Visual Insights</h3>
                         <p style={styles.featureDesc}>Understand your strengths and weaknesses with interactive charts.</p>
                     </div>
                     <div style={styles.featureCard}>
-                        <div style={{ ...styles.iconBox, backgroundColor: '#fdf2f8' }}>🎯</div>
+                        <div style={{ ...styles.iconBox, backgroundColor: 'rgba(236, 72, 153, 0.2)' }}>🎯</div>
                         <h3 style={styles.featureTitle}>Smart Targets</h3>
                         <p style={styles.featureDesc}>Receive tailored roadmap to improve your readiness score.</p>
                     </div>
@@ -109,7 +105,8 @@ const Home = () => {
 const styles = {
     pageWrapper: {
         minHeight: '100vh',
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'var(--bg)',
+        color: 'var(--text)',
         position: 'relative',
         overflowX: 'hidden',
         fontFamily: '"Inter", sans-serif',
@@ -125,27 +122,26 @@ const styles = {
     },
     blob: {
         position: 'absolute',
-        width: '50%',
-        height: '50%',
+        width: '40vw',
+        height: '40vw',
         borderRadius: '50%',
-        mixBlendMode: 'multiply',
-        filter: 'blur(64px)',
-        opacity: 0.2,
+        filter: 'blur(100px)',
+        opacity: 0.25,
     },
     blob1: {
-        top: '-20%',
+        top: '-10%',
         left: '-10%',
-        backgroundColor: '#60a5fa', // blue-400
+        backgroundColor: '#60a5fa',
     },
     blob2: {
         top: '20%',
         right: '-10%',
-        backgroundColor: '#c084fc', // purple-400
+        backgroundColor: '#c084fc',
     },
     blob3: {
         bottom: '-20%',
         left: '20%',
-        backgroundColor: '#f472b6', // pink-400
+        backgroundColor: '#f472b6',
     },
     navbar: {
         position: 'relative',
@@ -163,28 +159,28 @@ const styles = {
         gap: '1.5rem',
     },
     navLink: {
-        color: '#4b5563',
+        color: 'var(--sub)',
         textDecoration: 'none',
         fontWeight: '500',
         transition: 'color 0.2s',
     },
     navLinkHover: {
-        color: '#111827',
+        color: 'var(--text)',
     },
     signupBtn: {
-        backgroundColor: '#111827',
-        color: 'white',
+        backgroundColor: 'var(--text)',
+        color: 'var(--bg)',
         padding: '0.625rem 1.25rem',
         borderRadius: '9999px',
         textDecoration: 'none',
-        fontWeight: '500',
+        fontWeight: '600',
         transition: 'all 0.2s',
         boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
     },
     signupBtnHover: {
-        backgroundColor: '#1f2937',
         transform: 'translateY(-2px)',
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+        opacity: 0.9,
     },
     heroSection: {
         position: 'relative',
@@ -195,20 +191,20 @@ const styles = {
         textAlign: 'center',
     },
     heroTitle: {
-        fontSize: '4rem',
+        fontSize: '4.5rem',
         fontWeight: '800',
-        color: '#111827',
+        color: 'var(--text)',
         marginBottom: '1.5rem',
         lineHeight: 1.1,
     },
     gradientText: {
-        background: 'linear-gradient(to right, #2563eb, #9333ea)',
+        background: 'linear-gradient(to right, #6366f1, #9333ea)',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
     },
     heroSubtitle: {
         fontSize: '1.25rem',
-        color: '#4b5563',
+        color: 'var(--sub)',
         marginBottom: '2.5rem',
         maxWidth: '42rem',
         margin: '0 auto 2.5rem',
@@ -220,9 +216,9 @@ const styles = {
         gap: '1rem',
     },
     primaryBtn: {
-        background: 'linear-gradient(to right, #2563eb, #9333ea)',
+        background: 'linear-gradient(to right, #6366f1, #9333ea)',
         color: 'white',
-        padding: '1rem 2rem',
+        padding: '1rem 2.5rem',
         borderRadius: '9999px',
         textDecoration: 'none',
         fontWeight: 'bold',
@@ -230,60 +226,60 @@ const styles = {
         transition: 'all 0.2s',
     },
     primaryBtnHover: {
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        boxShadow: '0 25px 50px -12px rgba(99, 102, 241, 0.4)',
         transform: 'scale(1.05)',
     },
     secondaryBtn: {
-        backgroundColor: 'white',
-        color: '#1f2937',
-        padding: '1rem 2rem',
+        backgroundColor: 'var(--card)',
+        color: 'var(--text)',
+        padding: '1rem 2.5rem',
         borderRadius: '9999px',
         textDecoration: 'none',
         fontWeight: 'bold',
         fontSize: '1.125rem',
-        border: '1px solid #e5e7eb',
+        border: '1px solid var(--border)',
         transition: 'all 0.2s',
     },
     secondaryBtnHover: {
-        borderColor: '#d1d5db',
-        backgroundColor: '#f9fafb',
+        borderColor: 'var(--text)',
+        backgroundColor: 'var(--border)',
     },
     featureGrid: {
-        marginTop: '5rem',
+        marginTop: '6rem',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: '2rem',
     },
     featureCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        backgroundColor: 'var(--card)',
         backdropFilter: 'blur(10px)',
-        padding: '2rem',
+        padding: '2.5rem',
         borderRadius: '1.5rem',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        border: '1px solid var(--border)',
+        boxShadow: '0 10px 30px var(--border)',
         transition: 'transform 0.3s, box-shadow 0.3s',
-        cursor: 'default',
     },
     iconBox: {
-        width: '3rem',
-        height: '3rem',
-        borderRadius: '0.75rem',
+        width: '3.5rem',
+        height: '3.5rem',
+        borderRadius: '1rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '1rem',
+        marginBottom: '1.5rem',
         marginLeft: 'auto',
         marginRight: 'auto',
-        fontSize: '1.5rem',
+        fontSize: '1.75rem',
     },
     featureTitle: {
         fontSize: '1.25rem',
         fontWeight: 'bold',
-        color: '#111827',
-        marginBottom: '0.5rem',
+        color: 'var(--text)',
+        marginBottom: '0.75rem',
     },
     featureDesc: {
-        color: '#4b5563',
+        color: 'var(--sub)',
+        lineHeight: 1.5,
     },
 };
 

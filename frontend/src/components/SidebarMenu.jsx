@@ -20,7 +20,7 @@ const SidebarMenu = ({ color = "#1f2937" }) => {
     // ✅ CLEAN NAV ITEMS (no emoji in label)
     const navItems = [
         { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-        { path: '/', label: 'Home', icon: '🏡' },
+        { path: '/overview', label: 'Overview', icon: '🏡' },
         { path: '/profile', label: 'Profile', icon: '👤' },
         { path: '/history', label: 'History', icon: '📜' },
         { path: '/about', label: 'About', icon: 'ℹ️' },

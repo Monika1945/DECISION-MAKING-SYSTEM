@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import API_BASE from "../config";
@@ -7,26 +7,48 @@ const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [isHovered, setIsHovered] = useState(false);
     const [isLinkHovered, setIsLinkHovered] = useState(false);
+    const [isDark, setIsDark] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setIsDark(savedTheme === 'dark');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, []);
+
+    const toggleTheme = () => {
+        const root = document.documentElement;
+        root.classList.toggle('dark');
+        const dark = root.classList.contains('dark');
+        setIsDark(dark);
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    };
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        const res = await axios.post(`${API_BASE}/api/auth/login`, formData);
-        localStorage.setItem('token', res.data.token);
-        navigate('/dashboard');
-    } catch (err) {
-        console.error('Login error:', err);
-        const errorMsg = err.response?.data?.msg || 'Login failed. Please try again.';
-        alert(errorMsg);
-    }
-};
+        e.preventDefault();
+        try {
+            const res = await axios.post(`${API_BASE}/api/auth/login`, formData);
+            localStorage.setItem('token', res.data.token);
+            navigate('/dashboard');
+        } catch (err) {
+            console.error('Login error:', err);
+            const errorMsg = err.response?.data?.msg || 'Login failed. Please try again.';
+            alert(errorMsg);
+        }
+    };
 
     return (
         <div style={styles.pageWrapper}>
-            {/* Background Shapes */}
+            <button onClick={toggleTheme} style={styles.themeBtn}>
+                {isDark ? '☀️ Light' : '🌙 Dark'}
+            </button>
+
             <div style={styles.backgroundContainer}>
                 <div style={{ ...styles.blob, ...styles.blob1 }}></div>
                 <div style={{ ...styles.blob, ...styles.blob2 }}></div>
@@ -94,10 +116,25 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f9fafb',
+        backgroundColor: 'var(--bg)',
+        color: 'var(--text)',
         position: 'relative',
         overflow: 'hidden',
         fontFamily: '"Inter", sans-serif',
+        transition: 'all 0.4s'
+    },
+    themeBtn: {
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        padding: '8px 14px',
+        borderRadius: '20px',
+        border: 'none',
+        cursor: 'pointer',
+        background: 'var(--primary)',
+        color: '#fff',
+        fontWeight: 'bold',
+        zIndex: 20
     },
     backgroundContainer: {
         position: 'absolute',
@@ -114,28 +151,28 @@ const styles = {
         height: '18rem',
         borderRadius: '50%',
         mixBlendMode: 'multiply',
-        filter: 'blur(40px)',
-        opacity: 0.3,
+        filter: 'blur(70px)',
+        opacity: 0.25,
     },
     blob1: {
         top: '10%',
         left: '20%',
-        backgroundColor: '#d8b4fe', // purple-300
+        backgroundColor: '#d8b4fe',
     },
     blob2: {
         top: '30%',
         right: '20%',
-        backgroundColor: '#93c5fd', // blue-300
+        backgroundColor: '#93c5fd',
     },
     card: {
         position: 'relative',
         zIndex: 10,
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
+        backgroundColor: 'var(--card)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid var(--border)',
         padding: '2.5rem',
         borderRadius: '1rem',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 20px 40px var(--border)',
         width: '100%',
         maxWidth: '28rem',
     },
@@ -144,7 +181,7 @@ const styles = {
         fontWeight: 'bold',
         marginBottom: '2rem',
         textAlign: 'center',
-        color: '#1f2937',
+        color: 'var(--text)',
     },
     form: {
         display: 'flex',
@@ -158,16 +195,17 @@ const styles = {
     },
     label: {
         display: 'block',
-        color: '#374151',
+        color: 'var(--sub)',
         fontSize: '0.875rem',
         fontWeight: '600',
     },
     input: {
         width: '100%',
-        padding: '0.75rem 1rem',
+        padding: '0.8rem 1rem',
         borderRadius: '0.5rem',
-        backgroundColor: '#f9fafb',
-        border: '1px solid #e5e7eb',
+        backgroundColor: 'var(--bg)',
+        border: '1px solid var(--border)',
+        color: 'var(--text)',
         outline: 'none',
         transition: 'all 0.2s',
         fontSize: '1rem',
@@ -175,27 +213,28 @@ const styles = {
     },
     button: {
         width: '100%',
-        background: 'linear-gradient(to right, #2563eb, #9333ea)',
+        background: 'var(--primary)',
         color: 'white',
         fontWeight: 'bold',
-        padding: '0.75rem',
+        padding: '0.85rem',
         borderRadius: '0.5rem',
         border: 'none',
         cursor: 'pointer',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)',
         transition: 'all 0.2s',
+        fontSize: '1.05rem'
     },
     buttonHover: {
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         transform: 'translateY(-2px)',
+        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.6)',
     },
     footerText: {
         marginTop: '1.5rem',
         textAlign: 'center',
-        color: '#4b5563',
+        color: 'var(--sub)',
     },
     link: {
-        color: '#2563eb',
+        color: 'var(--primary)',
         fontWeight: '600',
         textDecoration: 'none',
         transition: 'color 0.2s',
