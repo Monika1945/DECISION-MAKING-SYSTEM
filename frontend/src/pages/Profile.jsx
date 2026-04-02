@@ -3,8 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import SidebarMenu from '../components/SidebarMenu';
 import ProjectLogo from '../components/Logo';
-
-const API_BASE = "https://decision-backend-pl2m.onrender.com";
+import API_BASE from '../config';
 
 const Profile = () => {
     const [user, setUser] = useState(null);

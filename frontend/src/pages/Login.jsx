@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import API_BASE from "../config";
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [isHovered, setIsHovered] = useState(false);
     const [isLinkHovered, setIsLinkHovered] = useState(false);
     const navigate = useNavigate();
-
-    const API_BASE = "https://decision-backend-pl2m.onrender.com";
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-
-const API_BASE = "https://decision-backend-pl2m.onrender.com";
+import API_BASE from "../config";
 
 const Signup = () => {
     const [formData, setFormData] = useState({

@@ -4,6 +4,7 @@ import SidebarMenu from "../components/SidebarMenu";
 import ProjectLogo from "../components/Logo";
 import { useNavigate } from "react-router-dom";
 import API_BASE from "../config";
+import { getRandomQuestions } from "../utils/questions";
 
 const Evaluation = () => {
   const navigate = useNavigate();
@@ -63,101 +64,9 @@ const Evaluation = () => {
 
   const t = darkMode ? theme.dark : theme.light;
 
-  const questionBank = {
-    Aptitude: [
-      {
-        q: "A company reduces 500 units by 20%. New production?",
-        options: ["400", "420", "450", "380"],
-        ans: "400"
-      },
-      {
-        q: "Delivery travels 60km/hr for 3 hrs. Distance?",
-        options: ["180", "150", "120", "200"],
-        ans: "180"
-      },
-      {
-        q: "Profit Rs200 on Rs800. Profit %?",
-        options: ["25%", "20%", "30%", "40%"],
-        ans: "25%"
-      },
-      {
-        q: "SI on Rs1000 @10% for 2 yrs?",
-        options: ["200", "100", "300", "400"],
-        ans: "200"
-      },
-      {
-        q: "If x=2, x^2+2x?",
-        options: ["8", "6", "10", "12"],
-        ans: "8"
-      }
-    ],
-    Logical: [
-      {
-        q: "All devs are testers. Some testers managers?",
-        options: [
-          "Some devs may be managers",
-          "All devs managers",
-          "None",
-          "All testers devs"
-        ],
-        ans: "Some devs may be managers"
-      },
-      { q: "2,4,8,16,?", options: ["32", "24", "20", "18"], ans: "32" },
-      {
-        q: "Odd one: Apple, Mango, Carrot",
-        options: ["Carrot", "Apple", "Mango", "None"],
-        ans: "Carrot"
-      },
-      { q: "Mirror LEFT?", options: ["TFEL", "LEFT", "FLET", "None"], ans: "TFEL" },
-      { q: "A>B, B>C?", options: ["A>C", "C>A", "A=B", "None"], ans: "A>C" }
-    ],
-    Verbal: [
-      {
-        q: "Seamlessly means?",
-        options: ["Without problems", "Slow", "Bad", "Incomplete"],
-        ans: "Without problems"
-      },
-      {
-        q: "Opposite of Strong?",
-        options: ["Weak", "Hard", "Big", "Solid"],
-        ans: "Weak"
-      },
-      { q: "She ___ going.", options: ["is", "are", "am", "be"], ans: "is" },
-      { q: "Rapid means?", options: ["Fast", "Slow", "Late", "Stop"], ans: "Fast" },
-      { q: "Execute?", options: ["Perform", "Stop", "Cancel", "Break"], ans: "Perform" }
-    ],
-    Technical: [
-      {
-        q: "System programming language?",
-        options: ["C", "HTML", "CSS", "SQL"],
-        ans: "C"
-      },
-      {
-        q: "Java is?",
-        options: ["OOP", "Procedural", "Markup", "Functional"],
-        ans: "OOP"
-      },
-      {
-        q: "OS manages?",
-        options: ["Hardware", "Memory", "Process", "All"],
-        ans: "All"
-      },
-      {
-        q: "TCP layer?",
-        options: ["Transport", "Network", "DL", "Physical"],
-        ans: "Transport"
-      },
-      {
-        q: "RAM?",
-        options: ["Temporary", "Permanent", "External", "None"],
-        ans: "Temporary"
-      }
-    ]
-  };
-
   const startTest = (section) => {
     setActiveSection(section);
-    setQuestions(questionBank[section]);
+    setQuestions(getRandomQuestions(section, 5));
     setAnswers({});
   };
 

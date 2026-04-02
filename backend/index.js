@@ -14,7 +14,7 @@ app.use(express.json());
 
 // CORS configuration: allow your frontend URL only
 app.use(cors({
-    origin: 'https://decision-making-system-eight.vercel.app', // <-- your Vercel frontend
+    origin: ['https://decision-making-system-eight.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
